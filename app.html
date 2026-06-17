@@ -219,10 +219,8 @@ input::placeholder { color: var(--muted); font-size: 12px; }
     <button class="header-btn" id="backBtn" onclick="goBack()" title="返回" style="font-size:18px;visibility:hidden;">←</button>
     <!-- ✏️/👁️ 编辑/日常模式切换，仅当天和未来日期可用，过往日期锁住 -->
     <button class="header-btn" id="editToggle" onclick="toggleEditMode()" title="编辑/日常" style="font-size:18px;">✏️</button>
-    <!-- 🔥 连续习惯追踪页面 -->
-    <button class="header-btn" onclick="switchTab('streaks')" title="连续习惯" style="font-size:18px;">🔥</button>
-    <!-- 🔔 日程管理（通知记录已移至首页底部） -->
-    <button class="header-btn" onclick="switchTab('notifications')" title="日程管理" style="position:relative;font-size:18px;">🔔<span class="notif-badge hidden" id="notifBadge">0</span></button>
+    <!-- 🔔 日常提醒（统一提醒页面） -->
+    <button class="header-btn" onclick="switchTab('notifications')" title="日常提醒" style="position:relative;font-size:18px;">🔔<span class="notif-badge hidden" id="notifBadge">0</span></button>
     <!-- 🌙/☀️ 夜间模式切换，可手动或自动 -->
     <button class="header-btn" onclick="toggleNightMode()" title="夜间模式" id="nightToggle" style="font-size:18px;">🌙</button>
     <!-- 🏪 积分店铺 -->
@@ -331,39 +329,45 @@ input::placeholder { color: var(--muted); font-size: 12px; }
   </div>
 </div>
 
-<!-- ====== ⑤ 连续习惯 ====== -->
-<div class="page" id="page-streaks">
-  <div class="card">
-    <h3>连续习惯</h3>
-    <div id="streakList"></div>
-    <div class="add-row" id="streakAddRow">
-      <input id="streakNameInput" placeholder="新习惯名称">
-      <input id="streakTargetInput" placeholder="目标天数" type="number" style="max-width:80px;">
-      <button class="btn btn-sm" onclick="addStreakItem()">+</button>
-    </div>
-  </div>
-</div>
-
-<!-- ====== ⑥ 日程管理（原通知页） ====== -->
+<!-- ====== ⑤ 日常提醒（合并 🔥 + 🔔） ====== -->
 <div class="page" id="page-notifications">
   <div class="card">
-    <h3>日程</h3>
-    <div id="schedList"></div>
+    <h3>日常提醒</h3>
+    <div id="reminderList"></div>
   </div>
-  <div class="card">
-    <h3>添加日程</h3>
-    <div class="add-row">
-      <input id="schedTitle" placeholder="日程标题">
-      <input type="date" id="schedDate">
-      <input type="time" id="schedTime" style="flex:0.8;">
-    </div>
-    <div style="margin-top:6px;">
-      <select id="schedRepeat" onchange="schedRepeatChange()" style="border:1px solid var(--border);border-radius:8px;padding:6px;font-size:12px;background:var(--bg);color:var(--text);margin-right:6px;">
-        <option value="none">不重复</option><option value="daily">每天</option><option value="weekly">每周</option><option value="monthly">每月</option>
+  <div class="card" id="reminderAddCard">
+    <h3>添加</h3>
+    <div class="form-row">
+      <select id="remType" onchange="remTypeChange()" style="flex:0.5;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:var(--bg);color:var(--text);">
+        <option value="habit">日常</option><option value="event">事件</option>
       </select>
-      <span id="schedRepeatDetail" style="font-size:12px;"></span>
-      <button class="btn btn-sm" onclick="addSchedule()" style="margin-left:6px;">+</button>
+      <input id="remName" placeholder="名称" style="flex:1.5;">
+      <input type="time" id="remTime" style="flex:0.8;">
     </div>
+    <div id="remExtraHabit" style="margin-top:6px;">
+      <div class="form-row">
+        <span class="muted">频率</span>
+        <select id="remHabitFreq" onchange="remHabitFreqChange()" style="flex:1;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:var(--bg);color:var(--text);">
+          <option value="daily">每日</option><option value="weekly">每周</option><option value="monthly">每月</option>
+        </select>
+        <span class="muted">持续</span>
+        <input id="remHabitDays" type="number" value="30" min="1" style="flex:0.5;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:var(--bg);color:var(--text);">
+        <span class="muted">天</span>
+      </div>
+      <div id="remHabitWeekly" style="display:none;margin-top:4px;"></div>
+      <div id="remHabitMonthly" style="display:none;margin-top:4px;"></div>
+    </div>
+    <div id="remExtraEvent" style="display:none;margin-top:6px;">
+      <div class="form-row">
+        <input type="date" id="remEventDate" style="flex:1;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:var(--bg);color:var(--text);">
+        <select id="remAdvance" style="flex:1;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:var(--bg);color:var(--text);">
+          <option value="5">5分钟前</option><option value="15" selected>15分钟前</option><option value="30">30分钟前</option>
+          <option value="60">1小时前</option><option value="120">2小时前</option>
+          <option value="1440">1天前</option><option value="2880">2天前</option><option value="10080">1周前</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-block" onclick="addReminder()" style="margin-top:8px;">+</button>
   </div>
 </div>
 
@@ -396,22 +400,6 @@ input::placeholder { color: var(--muted); font-size: 12px; }
   <div class="card">
     <h3>极简模块显示项</h3>
     <div id="focusConfigForm"></div>
-  </div>
-  <div class="card">
-    <h3>营养品默认模板</h3>
-    <div id="nutritionTemplateList"></div>
-    <div class="add-row">
-      <input id="nutNameInput" placeholder="名称">
-      <input id="nutWhenInput" placeholder="时段描述">
-      <input type="time" id="nutTimeHint">
-      <button class="btn btn-sm" onclick="addNutritionTemplate()">+</button>
-    </div>
-    <div style="margin-top:8px;">
-      <span class="muted">每周休息日:</span>
-      <select id="restDay" onchange="updateRestDay()" style="border:1px solid var(--border);border-radius:6px;padding:4px;background:var(--bg);color:var(--text);margin-left:4px;">
-        <option value="">无</option><option value="0">周日</option><option value="1">周一</option><option value="2">周二</option><option value="3">周三</option><option value="4">周四</option><option value="5">周五</option><option value="6">周六</option>
-      </select>
-    </div>
   </div>
   <div class="card">
     <h3>数据</h3>
@@ -485,34 +473,46 @@ var sprintTimer = null, sprintStartTime = null, sprintTotalSec = 0;
 var rewards = load('rewards', []);
 var redemptionLog = load('redemption_log', []); // 兑换历史
 
-// ====== 连续习惯（独立打卡系统，和日常任务无关） ======
-// 每个习惯: { id, name, icon, start_date, end_date } 起止日期区间
-// streakRecords: { 'YYYY-MM-DD': { [streakId]: true/false } }
-// streakPointAwarded: { 'YYYY-MM-DD': { [streakId]: true/false } } 防重复加分
-var streaks = load('streaks', []);
-var streakRecords = load('streak_records', {});
-var streakPointAwarded = load('streak_point_awarded', {}); // 防重复加分
-var streakRewards = load('streak_rewards', {}); // { 'bonus_<streakId>_<end_date>': true } 完成全部区间后 +10 分
+// ====== 统一提醒：日常(habit) + 事件(event) ======
+// 日常: { id, type:'habit', name, time, start_date, end_date }
+// 事件: { id, type:'event', name, date, time, advance_minutes, notified }
+// habitRecords: { 'YYYY-MM-DD': { [reminderId]: true/false } } 打卡记录
+// habitPointAwarded: { 'YYYY-MM-DD': { [id]: true/false } } 防重复加分
+// habitRewards: 完成全部区间后 +10 分
+var reminders = load('reminders', []);
+var habitRecords = load('habit_records', {});
+var habitPointAwarded = load('habit_point_awarded', {});
+var habitRewards = load('habit_rewards', {});
 
-/* 迁移旧 streak 数据：target_days → start_date/end_date */
-(function migrateStreaks(){
-  var changed = false;
-  streaks.forEach(function(s){
-    if (!s.start_date || !s.end_date) {
-      s.start_date = TODAY;
-      var e = new Date(); e.setDate(e.getDate() + ((s.target_days||21) - 1));
-      s.end_date = e.toISOString().slice(0,10);
-      delete s.target_days;
-      changed = true;
-    }
-  });
-  if (changed) save('streaks',streaks);
+/* 迁移旧数据：streaks → reminders (type:habit) + calendarEvents → reminders (type:event) */
+(function migrateReminders(){
+  if (reminders.length > 0) return; // 已迁移过
+  var oldStreaks = load('streaks', null);
+  var oldEvents = load('calendar_events', null);
+  if (oldStreaks) {
+    oldStreaks.forEach(function(s){
+      if (!s.start_date) { s.start_date = TODAY; var e = new Date(); e.setDate(e.getDate()+((s.target_days||21)-1)); s.end_date = e.toISOString().slice(0,10); }
+      reminders.push({id:Date.now()+Math.random(),type:'habit',name:s.name,icon:s.icon,time:'',start_date:s.start_date,end_date:s.end_date});
+    });
+    habitRecords = load('streak_records', {});
+    habitPointAwarded = load('streak_point_awarded', {});
+    habitRewards = load('streak_rewards', {});
+    STORAGE.removeItem('streaks'); STORAGE.removeItem('streak_records'); STORAGE.removeItem('streak_point_awarded'); STORAGE.removeItem('streak_rewards');
+  }
+  if (oldEvents) {
+    oldEvents.forEach(function(e){ reminders.push({id:Date.now()+Math.random(),type:'event',name:e.title,date:e.date,time:e.time||'',advance_minutes:30,repeat:e.repeat||'none',notified:false}); });
+    STORAGE.removeItem('calendar_events');
+  }
+  if (reminders.length > 0) save('reminders',reminders);
 })();
+// Fix habitRecords key migration from old streakRecords
+if (habitRecords && Object.keys(habitRecords).length > 0 && !load('habit_records_migrated',false)) {
+  save('habit_records',habitRecords); save('habit_records_migrated',true);
+}
 
-// ====== 日程 & 通知 ======
-var calendarEvents = load('calendar_events', []); // 日程列表: { id, title, date, time, repeat, notified }
+// ====== 通知 ======
 var goldenTimes = load('golden_times', { morning_focus:'10:00', lunch_prep:'11:30', after_lunch:'12:30', wrap_up:'15:00' });
-var notificationLog = load('notification_log', []); // 通知历史: { id, type, title, message, timestamp, read }
+var notificationLog = load('notification_log', []); // 通知历史
 
 // ====== 页面状态 ======
 var calYear, calMonth, calSelected = TODAY; // 日历当前视图和选中日期
@@ -530,7 +530,6 @@ var starredTask = load('starred_task', {}); // { 'YYYY-MM-DD': taskId } 今日�
   if (nightMode.auto) checkNightAuto();
   if (nightMode.enabled) document.body.classList.add('night');
   updateNightToggle();
-  document.getElementById('restDay').value = restDay;
   updateEditToggle();
   startReminderEngine();
   renderCalendar();
@@ -611,9 +610,8 @@ function switchTab(tab) {
   if (tab === 'calendar') renderCalendar();
   else if (tab === 'sprint') renderSprint();
   else if (tab === 'shop') renderShop();
-  else if (tab === 'streaks') renderStreaksPage();
+  else if (tab === 'notifications' || tab === 'streaks') renderRemindersPage();
   else if (tab === 'settings') renderSettings();
-  else if (tab === 'notifications') renderSchedulePage();
   else if (tab === 'day') renderDayDetail();
   window.scrollTo(0,0);
   updateBackBtn();
@@ -658,7 +656,7 @@ function renderCalendar() {
     var ds = calYear+'-'+String(calMonth).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     var isToday = ds === TODAY, isSel = ds === calSelected;
     var tr = taskRecords[ds], hasTask = tr && Object.values(tr.done||{}).filter(Boolean).length > 0;
-    var hasEvent = calendarEvents.some(function(e){ return e.date === ds; });
+    var hasEvent = reminders.some(function(r){ return r.type==='event' && r.date === ds; });
     html += '<div class="cal-cell'+(isToday?' today':'')+(isSel?' selected':'')+'" onclick="selectCalDay(\''+ds+'\')">'+d;
     if (hasTask || hasEvent) html += '<div class="dots">'+(hasTask?'<div class="dot task-done"></div>':'')+(hasEvent?'<div class="dot event"></div>':'')+'</div>';
     html += '</div>';
@@ -732,13 +730,14 @@ function renderFocusBlock() {
     }
     document.getElementById('focusTopTask').innerHTML = topText;
   } else { document.getElementById('focusTopTask').innerHTML = ''; }
-  // 连续习惯：名称+进度百分比+打卡按钮
+  // 日常提醒（仅 habit 类型）：名称+进度+打卡按钮
   if (config.indexOf('streaks') !== -1) {
-    var shtml = ''; streaks.forEach(function(s){
-      var info = computeStreak(s);
-      var todayDone = (streakRecords[TODAY]||{})[s.id] || false;
-      shtml += '<span class="focus-streak-chip">'+s.icon+s.name+' '+info.pct+'% ';
-      if (!isPast) shtml += '<button class="streak-btn'+(todayDone?' done':'')+'" onclick="event.stopPropagation();toggleStreakDay('+s.id+')">'+(todayDone?'✓':'○')+'</button>';
+    var habits = reminders.filter(function(r){return r.type==='habit';});
+    var shtml = ''; habits.forEach(function(h){
+      var info = computeHabit(h);
+      var todayDone = (habitRecords[TODAY]||{})[h.id] || false;
+      shtml += '<span class="focus-streak-chip">'+(h.icon||'🔸')+h.name+' '+info.pct+'% ';
+      if (!isPast) shtml += '<button class="streak-btn'+(todayDone?' done':'')+'" onclick="event.stopPropagation();toggleHabitDay('+h.id+')">'+(todayDone?'✓':'○')+'</button>';
       shtml += '</span>';
     });
     document.getElementById('focusStreaks').innerHTML = shtml;
@@ -859,11 +858,11 @@ function renderDayDetail() {
   document.getElementById('dayDetailTasks').innerHTML = thtml;
 
   /* 日程 */
-  var dayEvents = calendarEvents.filter(function(e){ return e.date === ds; });
+  var dayEvents = reminders.filter(function(r){ return r.type==='event' && r.date === ds; });
   var ehtml = '';
   dayEvents.forEach(function(e){
-    ehtml += '<div style="font-size:13px;padding:3px 0;">'+(e.time?e.time+' ':'全天 ')+esc(e.title);
-    if (e.repeat !== 'none') ehtml += ' <span class="muted">每'+{daily:'天',weekly:'周',monthly:'月'}[e.repeat]+'</span>';
+    ehtml += '<div style="font-size:13px;padding:3px 0;">'+(e.time?e.time+' ':'全天 ')+esc(e.name);
+    if (e.advance_minutes) ehtml += ' <span class="muted">提前'+e.advance_minutes+'分</span>';
     ehtml += '</div>';
   });
   if (!dayEvents.length) ehtml += '<p class="muted">暂无日程 · 点🔔添加</p>';
@@ -1083,119 +1082,115 @@ function redeemReward(i) {
 /*
    独立于日常任务。手动打卡，点阵显示已完成天数。
    点阵：● 绿 = 已打卡，○ 灰 = 未打卡。总点数 = 目标天数。
-   规则：1分/天，达到目标天数 +10分（仅一次）。
+// ====== 统一日常提醒（日常 habit + 事件 event） ======
+/*
+   日常 = 每天定时提醒 + 连续打卡追踪 + 进度条
+   事件 = 日期+时间一次性提醒 + 提前通知
+   数据统一存储在 reminders 数组。
 */
-/* 迁移旧数据 + 计算习惯在起止日期区间内的完成百分比 */
-function computeStreak(s) {
-  /* 兼容旧数据：无 start_date 则用 target_days 推算 */
-  if (!s.start_date || !s.end_date) {
-    if (s.target_days) { s.start_date = TODAY; var e = new Date(); e.setDate(e.getDate()+s.target_days-1); s.end_date = e.toISOString().slice(0,10); }
-    else { s.start_date = TODAY; s.end_date = TODAY; }
-    save('streaks',streaks);
-  }
-  var start = new Date(s.start_date), end = new Date(s.end_date);
+/* 计算日常完成百分比 */
+function computeHabit(h) {
+  if (!h.start_date || !h.end_date) return {done:0,total:0,pct:0};
+  var start = new Date(h.start_date), end = new Date(h.end_date);
   var totalDays = Math.floor((end - start) / 86400000) + 1; if (totalDays <= 0 || isNaN(totalDays)) return {done:0,total:0,pct:0};
   var done = 0, d = new Date(start);
   while (d <= end) {
     var dk = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    if ((streakRecords[dk]||{})[s.id]) done++;
+    if ((habitRecords[dk]||{})[h.id]) done++;
     d.setDate(d.getDate()+1);
   }
   var pct = Math.round(done / totalDays * 100);
-  var bonusKey = 'bonus_'+s.id+'_'+s.end_date;
-  if (pct >= 100 && !streakRewards[bonusKey]) { streakRewards[bonusKey] = true; save('streak_rewards',streakRewards); addPoints(10, 'streak_bonus_'+s.id); toast(s.icon+' '+s.name+' 全部完成！+10分'); }
+  var bonusKey = 'bonus_'+h.id+'_'+h.end_date;
+  if (pct >= 100 && !habitRewards[bonusKey]) { habitRewards[bonusKey] = true; save('habit_rewards',habitRewards); addPoints(10, 'habit_bonus_'+h.id); toast((h.icon||'')+' '+h.name+' 全部完成！+10分'); }
   return {done:done,total:totalDays,pct:pct};
 }
-/* 手动打卡：防重复加分 */
-function toggleStreakDay(sid) {
-  if (!streakRecords[TODAY]) streakRecords[TODAY] = {};
-  if (!streakPointAwarded[TODAY]) streakPointAwarded[TODAY] = {};
-  if (streakRecords[TODAY][sid]) {
-    streakRecords[TODAY][sid] = false;
-    if (streakPointAwarded[TODAY][sid] && pointRecords[TODAY]) {
-      pointRecords[TODAY] = Math.max(0, (pointRecords[TODAY]||0) - 1);
-      save('point_records',pointRecords); updatePointsUI();
-    }
-    streakPointAwarded[TODAY][sid] = false;
+/* 日常打卡：防重复加分 */
+function toggleHabitDay(hid) {
+  if (!habitRecords[TODAY]) habitRecords[TODAY] = {};
+  if (!habitPointAwarded[TODAY]) habitPointAwarded[TODAY] = {};
+  if (habitRecords[TODAY][hid]) {
+    habitRecords[TODAY][hid] = false;
+    if (habitPointAwarded[TODAY][hid] && pointRecords[TODAY]) { pointRecords[TODAY] = Math.max(0,(pointRecords[TODAY]||0)-1); save('point_records',pointRecords); updatePointsUI(); }
+    habitPointAwarded[TODAY][hid] = false;
   } else {
-    streakRecords[TODAY][sid] = true;
-    if (!streakPointAwarded[TODAY][sid]) {
-      streakPointAwarded[TODAY][sid] = true;
-      addPoints(1, 'streak_'+sid+'_'+TODAY);
-    }
+    habitRecords[TODAY][hid] = true;
+    if (!habitPointAwarded[TODAY][hid]) { habitPointAwarded[TODAY][hid] = true; addPoints(1, 'habit_'+hid+'_'+TODAY); }
   }
-  save('streak_records',streakRecords);
-  save('streak_point_awarded',streakPointAwarded);
+  save('habit_records',habitRecords); save('habit_point_awarded',habitPointAwarded);
   renderFocusBlock();
-  if (currentTab === 'streaks') renderStreaksPage();
+  if (currentTab === 'notifications' || currentTab === 'streaks') renderRemindersPage();
 }
-/* 连续习惯页面：进度条 + 起止日期 */
-function renderStreaksPage() {
-  var html = '';
-  streaks.forEach(function(s,i){
-    var info = computeStreak(s);
-    html += '<div style="margin-bottom:14px;">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><span style="font-size:14px;font-weight:500;">'+s.icon+' '+esc(s.name)+'</span><span style="font-weight:600;color:var(--accent);">'+info.pct+'%</span></div>';
-    html += '<div class="streak-bar-bg"><div class="streak-bar-fg" style="width:'+info.pct+'%"></div></div>';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;"><span class="muted">'+s.start_date+' ~ '+s.end_date+' · '+info.done+'/'+info.total+' 天</span>';
-    html += '<button class="delete-btn" onclick="deleteStreakItem('+i+')">×</button></div>';
-    html += '</div>';
-  });
-  if (!streaks.length) html = '<p class="muted">暂无连续习惯</p>';
-  document.getElementById('streakList').innerHTML = html;
+/* 类型切换：日常/事件 */
+function remTypeChange() {
+  var t = document.getElementById('remType').value;
+  document.getElementById('remExtraHabit').style.display = t==='habit'?'block':'none';
+  document.getElementById('remExtraEvent').style.display = t==='event'?'block':'none';
+  if (t==='habit') remHabitFreqChange();
 }
-function addStreakItem() {
-  var name = document.getElementById('streakNameInput').value.trim(), target = parseInt(document.getElementById('streakTargetInput').value)||21;
-  if (!name) return;
-  var id = Math.max(0, streaks.reduce(function(m,s){return Math.max(m,s.id);},0)) + 1;
-  var start = TODAY;
-  var end = new Date(); end.setDate(end.getDate() + target - 1);
-  var endStr = end.getFullYear()+'-'+String(end.getMonth()+1).padStart(2,'0')+'-'+String(end.getDate()).padStart(2,'0');
-  streaks.push({id:id,name:name,icon:'🔸',start_date:start,end_date:endStr}); save('streaks',streaks);
-  document.getElementById('streakNameInput').value = ''; document.getElementById('streakTargetInput').value = '';
-  renderStreaksPage(); renderFocusBlock(); toast('已添加「'+name+'」');
-}
-function deleteStreakItem(i) { var s = streaks[i]; streaks.splice(i,1); save('streaks',streaks); renderStreaksPage(); renderFocusBlock(); toast('已删除「'+s.name+'」'); }
-
-// ====== 日程管理 ⑥ ======
-/* 日程按日期排序。每周可选星期几，每月可选几号。到点触发通知。 */
-function renderSchedulePage() {
-  var html = '';
-  var sorted = calendarEvents.slice().sort(function(a,b){ return a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''); });
-  sorted.forEach(function(e){
-    html += '<div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">';
-    html += '<span>'+e.date+' '+(e.time||'全天')+' '+esc(e.title)+(e.repeat!=='none'?' <span class="muted">每'+{daily:'天',weekly:'周',monthly:'月'}[e.repeat]+'</span>':'')+'</span>';
-    html += '<button class="delete-btn" onclick="deleteSchedule('+e.id+')">×</button></div>';
-  });
-  document.getElementById('schedList').innerHTML = html || '<p class="muted">暂无日程</p>';
-  schedRepeatChange(); // 刷新重复选项的详细 UI
-}
-/* 根据选中的重复类型，动态显示「每周几」或「每月几号」选择器 */
-function schedRepeatChange() {
-  var val = document.getElementById('schedRepeat').value, detail = document.getElementById('schedRepeatDetail');
+/* 频率切换：每日/每周显示哪些天/每月几号 */
+function remHabitFreqChange() {
+  var val = document.getElementById('remHabitFreq').value;
+  document.getElementById('remHabitWeekly').style.display = val==='weekly'?'block':'none';
+  document.getElementById('remHabitMonthly').style.display = val==='monthly'?'block':'none';
   if (val === 'weekly') {
-    var dayNames = ['周日','周一','周二','周三','周四','周五','周六'];
-    var html = ''; dayNames.forEach(function(dn,i){ html += '<label style="margin-left:4px;font-size:12px;"><input type="checkbox" value="'+i+'"'+(schedRepeatDays.indexOf(i)!==-1?' checked':'')+' onchange="schedRepeatDays=[];var cbs=document.querySelectorAll(\'#schedRepeatDetail input\');cbs.forEach(function(cb){if(cb.checked)schedRepeatDays.push(parseInt(cb.value));});">'+dn+'</label>'; });
-    detail.innerHTML = html;
+    var dayNames = ['日','一','二','三','四','五','六'], h = '';
+    dayNames.forEach(function(dn,i){ h += '<label style="margin-right:4px;font-size:12px;"><input type="checkbox" value="'+i+'" class="rem-weekday">周'+dn+'</label>'; });
+    document.getElementById('remHabitWeekly').innerHTML = h;
   } else if (val === 'monthly') {
-    detail.innerHTML = '<span style="font-size:12px;margin-left:4px;">每月 <input type="number" id="schedMonthDay" value="1" min="1" max="31" style="width:50px;border:1px solid var(--border);border-radius:6px;padding:4px;text-align:center;background:var(--bg);color:var(--text);"> 号</span>';
-  } else { detail.innerHTML = ''; }
+    document.getElementById('remHabitMonthly').innerHTML = '<span class="muted">每月 </span><input type="number" id="remMonthDay" value="1" min="1" max="31" style="width:50px;border:1px solid var(--border);border-radius:6px;padding:4px;text-align:center;background:var(--bg);color:var(--text);"><span class="muted"> 号</span>';
+  }
 }
-function addSchedule() {
-  var title = document.getElementById('schedTitle').value.trim(); if (!title) return;
-  /* 确保日期不为空：input 未填时用 TODAY */
-  var dateVal = document.getElementById('schedDate').value;
-  var date = (dateVal !== '') ? dateVal : TODAY;
-  var time = document.getElementById('schedTime').value;
-  var repeat = document.getElementById('schedRepeat').value;
-  var repeatDetail = repeat === 'weekly' ? schedRepeatDays.join(',') : (repeat === 'monthly' ? (document.getElementById('schedMonthDay')||{}).value||'1' : '');
-  var id = Math.max(0, calendarEvents.reduce(function(m,e){return Math.max(m,e.id);},0)) + 1;
-  calendarEvents.push({id:id,title:title,date:date,time:time,type:'event',repeat:repeat,repeatDetail:repeatDetail,notified:false});
-  save('calendar_events',calendarEvents);
-  document.getElementById('schedTitle').value = ''; document.getElementById('schedTime').value = '';
-  renderSchedulePage(); renderCalendar(); toast('已添加日程');
+/* 添加提醒 */
+function addReminder() {
+  var type = document.getElementById('remType').value;
+  var name = document.getElementById('remName').value.trim(); if (!name) return;
+  var time = document.getElementById('remTime').value;
+  var id = Date.now() + Math.random();
+  if (type === 'habit') {
+    var days = parseInt(document.getElementById('remHabitDays').value) || 30;
+    var start = TODAY, end = new Date(); end.setDate(end.getDate()+days-1);
+    var freq = document.getElementById('remHabitFreq').value;
+	    var h = {id:id,type:'habit',name:name,icon:'🔸',time:time,start_date:start,end_date:end.toISOString().slice(0,10),frequency:freq};
+	    if (freq === 'weekly') { h.weekdays = []; document.querySelectorAll('.rem-weekday:checked').forEach(function(cb){h.weekdays.push(parseInt(cb.value));}); }
+	    else if (freq === 'monthly') { var md = document.getElementById('remMonthDay'); h.month_day = md ? parseInt(md.value) : 1; }
+	    reminders.push(h);
+  } else {
+    var date = document.getElementById('remEventDate').value || TODAY;
+    var advance = parseInt(document.getElementById('remAdvance').value) || 30;
+    reminders.push({id:id,type:'event',name:name,date:date,time:time,advance_minutes:advance,notified:false});
+  }
+  save('reminders',reminders);
+  document.getElementById('remName').value = ''; document.getElementById('remTime').value = '';
+  renderRemindersPage(); renderFocusBlock(); renderCalendar(); toast('已添加「'+name+'」');
 }
-function deleteSchedule(id) { calendarEvents = calendarEvents.filter(function(e){ return e.id !== id; }); save('calendar_events',calendarEvents); renderSchedulePage(); renderCalendar(); }
+/* 删除提醒 */
+function deleteReminder(id) { reminders = reminders.filter(function(r){return r.id!==id;}); save('reminders',reminders); renderRemindersPage(); renderFocusBlock(); renderCalendar(); }
+/* 渲染统一提醒页面：日常在上，事件在下 */
+function renderRemindersPage() {
+  var habits = reminders.filter(function(r){return r.type==='habit';});
+  var events = reminders.filter(function(r){return r.type==='event';});
+  var html = '';
+  if (habits.length) {
+    html += '<div style="font-size:13px;color:var(--muted);margin-bottom:6px;">日常</div>';
+    habits.forEach(function(h){
+      var info = computeHabit(h);
+      html += '<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><span style="font-size:14px;font-weight:500;">'+(h.icon||'🔸')+' '+esc(h.name)+(h.time?' <span class="muted">'+h.time+'</span>':'')+'</span><span style="font-weight:600;color:var(--accent);">'+info.pct+'%</span></div>';
+      html += '<div class="streak-bar-bg"><div class="streak-bar-fg" style="width:'+info.pct+'%"></div></div>';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;"><span class="muted">'+h.start_date+' ~ '+h.end_date+' · '+info.done+'/'+info.total+' 天</span>';
+      html += '<button class="delete-btn" onclick="deleteReminder('+h.id+')">×</button></div></div>';
+    });
+  }
+  if (events.length) {
+    html += '<div style="font-size:13px;color:var(--muted);margin-bottom:6px;'+(habits.length?'margin-top:10px;':'')+'">事件</div>';
+    events.sort(function(a,b){return a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||'');}).forEach(function(e){
+      var advText = e.advance_minutes ? (e.advance_minutes>=1440?(e.advance_minutes/1440)+'天前':(e.advance_minutes>=60?(e.advance_minutes/60)+'小时前':e.advance_minutes+'分钟前')) : '';
+      html += '<div style="font-size:13px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">';
+      html += '<span>'+e.date+' '+(e.time||'全天')+' '+esc(e.name)+(advText?' <span class="muted">提前'+advText+'</span>':'')+'</span>';
+      html += '<button class="delete-btn" onclick="deleteReminder('+e.id+')">×</button></div>';
+    });
+  }
+  document.getElementById('reminderList').innerHTML = html || '<p class="muted">暂无提醒</p>';
+}
 
 // ====== 通知记录（首页底部 + 提醒引擎） ======
 function renderNotifLog() {
@@ -1220,17 +1215,30 @@ function startReminderEngine() {
 }
 function checkReminders() {
   var now = new Date(), cur = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'), today = TODAY;
-  if (reminderSettings.last_check !== today) { calendarEvents.forEach(function(e){e.notified=false;}); save('calendar_events',calendarEvents); reminderSettings.last_check = today; save('reminder_settings',reminderSettings); }
-  if (reminderSettings.supplement_reminders) {
-    var nutToday = nutritionRecords[TODAY]||{}, isRest = restDay && new Date().getDay()==restDay;
-    nutritions.forEach(function(n){ if (n.time_hint && n.time_hint===cur && !nutToday[n.name] && !isRest) showNotification('supplement',n.name,'该吃「'+n.name+'」了（'+n.when+'）'); });
+  /* 每日午夜重置 notified 标记 */
+  if (reminderSettings.last_check !== today) {
+    reminders.forEach(function(r){ if(r.type==='event') r.notified = false; });
+    save('reminders',reminders); reminderSettings.last_check = today; save('reminder_settings',reminderSettings);
   }
+  /* 日常 habit：每天到 time 弹提醒 */
+  reminders.filter(function(r){return r.type==='habit' && r.time===cur;}).forEach(function(h){
+    showNotification('habit',h.name,'该做「'+h.name+'」了');
+  });
+  /* 事件：到时间弹提醒 + 提前提醒 */
+  reminders.filter(function(r){return r.type==='event';}).forEach(function(e){
+    if (e.date===today && e.time===cur && !e.notified) { showNotification('event',e.name,'预定: '+e.time); e.notified=true; save('reminders',reminders); }
+    /* 提前提醒：事件时间 - advance_minutes = 当前时间 */
+    if (e.date===today && e.time && e.advance_minutes) {
+      var eventMin = parseInt(e.time.split(':')[0])*60+parseInt(e.time.split(':')[1]);
+      var advMin = eventMin - e.advance_minutes;
+      var curMin = now.getHours()*60+now.getMinutes();
+      if (curMin === advMin && !e._advanceNotified) { showNotification('event','提前提醒',e.name+' 还有'+e.advance_minutes+'分钟'); e._advanceNotified = true; save('reminders',reminders); }
+    }
+  });
+  /* 黄金时段 */
   if (reminderSettings.golden_time_reminders) {
     var msgs = {morning_focus:{title:'10:00',body:'列出最重要的，趁精力最好的时候做'},lunch_prep:{title:'11:30',body:'准备好简餐'},after_lunch:{title:'12:30',body:'选一件小事帮大脑重启'},wrap_up:{title:'15:00',body:'回顾完成事项'}};
     for (var k in goldenTimes) { if (goldenTimes[k]===cur) showNotification('golden',msgs[k].title,msgs[k].body); }
-  }
-  if (reminderSettings.calendar_reminders) {
-    calendarEvents.forEach(function(e){ if (e.date===today && e.time===cur && !e.notified) { showNotification('calendar',e.title,'预定: '+e.time); e.notified=true; save('calendar_events',calendarEvents); } });
   }
 }
 function showNotification(type, title, msg) {
@@ -1265,24 +1273,11 @@ function renderSettings() {
   document.getElementById('reminderEnabled').value = reminderSettings.enabled ? '1' : '0';
   document.getElementById('reminderSound').value = reminderSettings.sound_enabled ? '1' : '0';
   document.getElementById('reminderAdvance').value = reminderSettings.advance_minutes || 5;
-  document.getElementById('restDay').value = restDay;
-  renderNutritionTemplate();
 }
 function setTheme(name) { settings.theme = name; save('settings',settings); applyTheme(name); renderSettings(); }
 function updateRule(key, val) { var v = parseInt(val); if (v >= 0) { settings.points_rules[key] = v; save('settings',settings); } }
 function toggleFocusItem(item) { var idx = focusModeConfig.items.indexOf(item); if (idx===-1) focusModeConfig.items.push(item); else focusModeConfig.items.splice(idx,1); save('focus_mode_config',focusModeConfig); }
 
-// ====== 营养品模板（设置页内） ======
-function renderNutritionTemplate() {
-  var html = ''; nutritions.forEach(function(n,i){
-    html += '<div class="add-row" style="margin-bottom:4px;"><input value="'+esc(n.name)+'" onchange="updateNutField('+i+',\'name\',this.value)" style="flex:1;"><input value="'+esc(n.when)+'" onchange="updateNutField('+i+',\'when\',this.value)" style="flex:1;"><input type="time" value="'+esc(n.time_hint||'')+'" onchange="updateNutField('+i+',\'time_hint\',this.value)" style="flex:1;"><button class="delete-btn" onclick="deleteNutritionTemplate('+i+')">×</button></div>';
-  });
-  document.getElementById('nutritionTemplateList').innerHTML = html;
-}
-function updateNutField(i, field, val) { nutritions[i][field] = val; save('nutritions',nutritions); }
-function addNutritionTemplate() { var name = document.getElementById('nutNameInput').value.trim(), when = document.getElementById('nutWhenInput').value.trim(), thint = document.getElementById('nutTimeHint').value; if (!name) return; nutritions.push({name:name,when:when,time_hint:thint}); save('nutritions',nutritions); document.getElementById('nutNameInput').value = ''; document.getElementById('nutWhenInput').value = ''; document.getElementById('nutTimeHint').value = ''; renderNutritionTemplate(); toast('已添加「'+name+'」'); }
-function deleteNutritionTemplate(i) { var n = nutritions[i]; nutritions.splice(i,1); save('nutritions',nutritions); renderNutritionTemplate(); toast('已删除「'+n.name+'」'); }
-function updateRestDay() { restDay = document.getElementById('restDay').value; save('rest_day',restDay); }
 
 // ====== 数据导入导出 ======
 function exportData() {
