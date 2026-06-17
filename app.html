@@ -778,8 +778,8 @@ function renderDayDetail() {
   if (isPast) { btn.style.visibility = 'hidden'; }
   else { btn.style.visibility = 'visible'; btn.textContent = editMode ? '👁️' : '✏️'; }
 
-  /* 筛选当前日期的任务，星标排第一 */
-  var sorted = tasks.filter(function(t){ return t.date === ds; }).sort(function(a,b){ return (a.order||0) - (b.order||0); });
+  /* 筛选当前日期有效的任务，星标排第一 */
+  var sorted = tasks.filter(function(t){ return taskActiveOn(t, ds); }).sort(function(a,b){ return (a.order||0)-(b.order||0); });
   if (starId) {
     var si = -1; for (var i = 0; i < sorted.length; i++) { if (sorted[i].id === starId) { si = i; break; } }
     if (si > 0) { var starItem = sorted.splice(si,1)[0]; sorted.unshift(starItem); }
@@ -888,6 +888,23 @@ function getDeadlineTextSS(ss) {
   var d = new Date(ss.created_date); d.setDate(d.getDate()+ss.max_days);
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
+/* 任务在某日期是否可见：当天创建 或 在有效期内延续且未提前完成 */
+function taskActiveOn(t, ds) {
+  if (t.date === ds) return true;
+  if (!t.date || !t.max_days || t.date > ds) return false;
+  var dl = new Date(t.date); dl.setDate(dl.getDate()+t.max_days);
+  var dk = dl.getFullYear()+'-'+String(dl.getMonth()+1).padStart(2,'0')+'-'+String(dl.getDate()).padStart(2,'0');
+  if (ds > dk) return false;
+  var start = new Date(t.date);
+  var cur = new Date(ds); cur.setDate(cur.getDate()-1);
+  while (cur >= start) {
+    var cdk = cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0')+'-'+String(cur.getDate()).padStart(2,'0');
+    var rec = taskRecords[cdk]; if (rec && rec.done && rec.done[String(t.id)]) return false;
+    cur.setDate(cur.getDate()-1);
+  }
+  return true;
+}
+
 function getDeadlineInfo(t, ds) {
   if (!t.max_days || !t.created_date) return null;
   var created = new Date(t.created_date);
