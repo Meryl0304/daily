@@ -1183,7 +1183,9 @@ function schedRepeatChange() {
 }
 function addSchedule() {
   var title = document.getElementById('schedTitle').value.trim(); if (!title) return;
-  var date = document.getElementById('schedDate').value || TODAY;
+  /* 确保日期不为空：input 未填时用 TODAY */
+  var dateVal = document.getElementById('schedDate').value;
+  var date = (dateVal !== '') ? dateVal : TODAY;
   var time = document.getElementById('schedTime').value;
   var repeat = document.getElementById('schedRepeat').value;
   var repeatDetail = repeat === 'weekly' ? schedRepeatDays.join(',') : (repeat === 'monthly' ? (document.getElementById('schedMonthDay')||{}).value||'1' : '');
