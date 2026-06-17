@@ -448,10 +448,16 @@ var focusModeConfig = load('focus_mode_config', { items:['date','top_task','stre
 var restDay = load('rest_day', ''); // 每周休息日: ''=无, '0'=周日 ... '6'=周六
 
 // ====== 日常任务 ======
-// 每个任务: { id, name, task_type:'daily'|'weekly', weekly_target, substeps:[{name,priority}], max_days, created_date }
-// max_days: 截止天数（从创建日起算），null=无截止
-// created_date: 创建日期，用于计算 deadline = created_date + max_days
+// 每个任务: { id, name, date:'YYYY-MM-DD', substeps:[], max_days, order }
+// taskRecords: { 'YYYY-MM-DD': { done:{id:bool}, points:{id:pts}, substeps:{taskId:{si:bool}} } }
 var tasks = load('tasks', []);
+
+/* 迁移：无 date 的旧任务默认分配到今天 */
+(function migrateTaskDates(){
+  var changed = false;
+  tasks.forEach(function(t){ if (!t.date) { t.date = TODAY; changed = true; } });
+  if (changed) save('tasks',tasks);
+})();
 var taskRecords = load('task_records', {});  // { 'YYYY-MM-DD': { done:{id:bool}, points:{id:pts}, substeps:{taskId:{si:bool}} } }
 var pointRecords = load('point_records', {}); // { 'YYYY-MM-DD': totalPointsForDay }
 
@@ -772,8 +778,8 @@ function renderDayDetail() {
   if (isPast) { btn.style.visibility = 'hidden'; }
   else { btn.style.visibility = 'visible'; btn.textContent = editMode ? '👁️' : '✏️'; }
 
-  /* 星标任务排第一，其余按 order 排序 */
-  var sorted = tasks.slice().sort(function(a,b){ return (a.order||0) - (b.order||0); });
+  /* 筛选当前日期的任务，星标排第一 */
+  var sorted = tasks.filter(function(t){ return t.date === ds; }).sort(function(a,b){ return (a.order||0) - (b.order||0); });
   if (starId) {
     var si = -1; for (var i = 0; i < sorted.length; i++) { if (sorted[i].id === starId) { si = i; break; } }
     if (si > 0) { var starItem = sorted.splice(si,1)[0]; sorted.unshift(starItem); }
@@ -785,7 +791,7 @@ function renderDayDetail() {
     var tDone = (tr.done||{})[String(t.id)] || false;
     var dlInfo = getDeadlineInfo(t, ds);
     var dlText = t.max_days && t.created_date ? getDeadlineText(t) : '';
-    var statusText = tDone ? '✓ 完成啦' : (dlInfo==='overdue'?'逾期':(dlInfo==='today'?'今天截止':'待处理'));
+    var statusText = tDone ? '✓ 完成啦' : (dlInfo==='overdue'?'逾期':(dlInfo==='today'?'今天截止':'未完成'));
 
     /* 子任务全完成判断：所有子任务完成母任务才算完成 */
     var allSubDone = false;
@@ -826,7 +832,7 @@ function renderDayDetail() {
         var ssDone = ssRec[si]||false;
         var ssDlInfo = getDeadlineInfoSS(ss, ds);
         var ssDlText = ss.max_days && ss.created_date ? getDeadlineTextSS(ss) : '';
-        var ssStatusText = ssDone ? '✓ 完成啦' : (ssDlInfo==='overdue'?'逾期':(ssDlInfo==='today'?'今天截止':'待处理'));
+        var ssStatusText = ssDone ? '✓ 完成啦' : (ssDlInfo==='overdue'?'逾期':(ssDlInfo==='today'?'今天截止':'未完成'));
         var ssCircleCls = ssDone?'done':(ssDlInfo==='today'?'deadline':(ssDlInfo==='overdue'?'overdue-c':''));
         var ssCircleContent = ssDone?'●':(ssDlInfo==='overdue'?'⚠':(ssDlInfo==='today'?'🔴':'○'));
         var ssRowCls = ssDone?'done-item':(ssDlInfo==='overdue'||ssDlInfo==='today'?'overdue':'pending');
@@ -852,6 +858,7 @@ function renderDayDetail() {
     thtml += '<div class="add-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">';
     thtml += '<input id="dayTaskInput" placeholder="新日常任务..." style="flex:3;">';
     thtml += '<input id="dayTaskMaxDays" type="number" placeholder="天数" style="max-width:50px;">';
+    thtml += '<input type="date" id="dayTaskDate" value="'+ds+'" min="'+TODAY+'" style="flex:1.5;font-size:12px;">';
     thtml += '<button class="btn btn-sm" onclick="dayAddTask()">+</button></div>';
   }
 
@@ -949,9 +956,10 @@ function dayAddTask() {
   var inp = document.getElementById('dayTaskInput'); if (!inp) return;
   var name = inp.value.trim(); if (!name) return;
   var maxDays = parseInt(document.getElementById('dayTaskMaxDays').value) || null;
+  var date = document.getElementById('dayTaskDate').value || calSelected;
   var id = Math.max(0, tasks.reduce(function(m,t){return Math.max(m,t.id);},0)) + 1;
-  var maxOrder = 0; tasks.forEach(function(t){ maxOrder = Math.max(maxOrder, t.order||0); });
-  tasks.push({id:id,name:name,task_type:'daily',substeps:[],max_days:maxDays,created_date:maxDays?TODAY:null,order:maxOrder+1});
+  var maxOrder = 0; tasks.filter(function(t){return t.date===date;}).forEach(function(t){ maxOrder = Math.max(maxOrder, t.order||0); });
+  tasks.push({id:id,name:name,date:date,substeps:[],max_days:maxDays,created_date:maxDays?date:null,order:maxOrder+1});
   save('tasks',tasks);
   inp.value = ''; document.getElementById('dayTaskMaxDays').value = '';
   renderDayDetail(); renderFocusBlock(); renderOverdueArea(); renderCalendar(); toast('已添加「'+name+'」');
