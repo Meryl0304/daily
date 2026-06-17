@@ -996,27 +996,6 @@ function removeSubstep(taskId, si) {
 /* 删除母任务及其所有子任务 */
 function deleteTaskById(id) { tasks = tasks.filter(function(t){return t.id!==id;}); save('tasks',tasks); renderDayDetail(); renderFocusBlock(); renderCalendar(); }
 
-/* 添加新任务：名称+截止天数 */
-function dayAddTask() {
-  var inp = document.getElementById('dayTaskInput'); if (!inp) return;
-  var name = inp.value.trim(); if (!name) return;
-  var taskType = document.getElementById('dayTaskType').value;
-  var weeklyTarget = taskType === 'weekly' ? (parseInt(document.getElementById('dayWeeklyTarget').value) || 3) : null;
-  var maxDays = parseInt(document.getElementById('dayTaskMaxDays').value) || null;
-  var id = Math.max(0, tasks.reduce(function(m,t){return Math.max(m,t.id);},0)) + 1;
-  var substeps = daySubstepTemp.slice(); daySubstepTemp = [];
-  tasks.push({id:id,name:name,task_type:taskType,weekly_target:weeklyTarget,substeps:substeps,max_days:maxDays,created_date:maxDays?TODAY:null});
-  save('tasks',tasks);
-  inp.value = ''; document.getElementById('dayWeeklyTarget').value = ''; document.getElementById('dayTaskMaxDays').value = '';
-  document.getElementById('daySubstepArea').style.display = 'none';
-  renderDayDetail(); renderFocusBlock(); renderCalendar(); toast('已添加「'+name+'」');
-}
-function deleteTask(i) { var t = tasks[i]; tasks.splice(i,1); save('tasks',tasks); renderDayDetail(); renderFocusBlock(); renderCalendar(); toast('已删除「'+t.name+'」'); }
-
-// --- 健康操作 ---
-function dayToggleNutrition(ds, name) { if (ds < TODAY) return; var today = nutritionRecords[ds]||{}; if (!nutritionRecords[ds]) nutritionRecords[ds] = {}; if (today[name]) { today[name] = false; } else { today[name] = true; addPoints(settings.points_rules.nutrition||2,'nutrition_'+ds+'_'+name); } save('nutrition_records',nutritionRecords); renderDayDetail(); renderFocusBlock(); }
-function dayAddWater(ds, n, isPast) { if (isPast) return; var prev = waterRecords[ds]||0; if (n <= prev) return; waterRecords[ds] = n; save('water_records',waterRecords); if (n <= 6) addPoints(settings.points_rules.water||1,'water_'+ds+'_'+n); renderDayDetail(); renderFocusBlock(); }
-
 // ====== 冲刺模式 ③ ======
 /* 环形计时器：B 阶段变色 + C 透明度渐变 */
 function renderSprint() {
