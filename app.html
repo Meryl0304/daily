@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.json">
+<title>日常管理</title>
+<style>
+/* ====== CSS 变量：日间主题 ====== */
+:root {
+  --bg: #f8f9fa; --card: #fff; --text: #2c3e50; --muted: #95a5a6;
+  --accent: #3498db; --done: #27ae60; --warn: #e74c3c; --border: #dee2e6;
+  --shadow: 0 1px 3px rgba(0,0,0,.08); --radius: 12px;
+  --btn: #3498db; --btn-text: #fff;
+  --incomplete-bg: #faf6f2; --incomplete-text: #b0a090;
+  --sprint-ring: #3498db; --sprint-ring-warn: #e67e22; --sprint-ring-urgent: #e74c3c;
+  --overdue-bg: #fff5f5; --overdue-text: #c0392b;
+}
+.theme-forest {
+  --bg: #f0f5f1; --card: #fff; --text: #2d3e2f; --muted: #7a8b7c;
+  --accent: #2ecc71; --done: #27ae60; --warn: #c0392b; --border: #c8d6c9;
+  --btn: #27ae60; --btn-text: #fff;
+  --incomplete-bg: #f2f5f0; --incomplete-text: #9aab9c;
+  --sprint-ring: #2ecc71; --sprint-ring-warn: #e67e22; --sprint-ring-urgent: #c0392b;
+  --overdue-bg: #fdf5f5; --overdue-text: #c0392b;
+}
+.theme-warm {
+  --bg: #fef9f0; --card: #fff; --text: #4a3728; --muted: #b8a088;
+  --accent: #e67e22; --done: #27ae60; --warn: #e74c3c; --border: #e8d5c0;
+  --btn: #e67e22; --btn-text: #fff;
+  --incomplete-bg: #fdf6ee; --incomplete-text: #c4a97d;
+  --sprint-ring: #e67e22; --sprint-ring-warn: #f0c040; --sprint-ring-urgent: #e74c3c;
+  --overdue-bg: #fef5f0; --overdue-text: #c0392b;
+}
+.theme-minimal {
+  --bg: #fff; --card: #fafafa; --text: #1a1a1a; --muted: #999;
+  --accent: #555; --done: #555; --warn: #555; --border: #e0e0e0;
+  --btn: #1a1a1a; --btn-text: #fff;
+  --incomplete-bg: #f8f8f8; --incomplete-text: #bbb;
+  --sprint-ring: #555; --sprint-ring-warn: #888; --sprint-ring-urgent: #333;
+  --overdue-bg: #fafafa; --overdue-text: #555;
+}
+
+/* ====== 夜间模式：深色背景 + 暖色文字护眼 ====== */
+body.night {
+  --bg: #1a1d23; --card: #252830; --text: #e0d8cc; --muted: #8a8578;
+  --border: #3a3d42; --shadow: 0 1px 3px rgba(0,0,0,.3);
+  --incomplete-bg: #2a2822; --incomplete-text: #6a6560;
+  --overdue-bg: #2a1a1a; --overdue-text: #e07070;
+}
+body.night.theme-forest { --bg:#1a201c; --card:#222822; --text:#d8e0d5; --muted:#7a8578; --border:#353a35; --incomplete-bg:#252a24; --incomplete-text:#6a7568; --overdue-bg:#2a1a1a; }
+body.night.theme-warm { --bg:#201d18; --card:#282520; --text:#e0d5c8; --muted:#8a8070; --border:#3a3530; --incomplete-bg:#2a2520; --incomplete-text:#7a7060; --overdue-bg:#2a2018; }
+body.night.theme-minimal { --bg:#111; --card:#1a1a1a; --text:#ccc; --muted:#666; --border:#333; --incomplete-bg:#1e1e1e; --incomplete-text:#555; --overdue-bg:#1e1e1e; }
+
+/* ====== 基础样式 ====== */
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--text);
+  max-width: 500px; margin: 0 auto;
+  min-height: 100vh; padding-bottom: 72px;
+}
+header {
+  background: var(--card); padding: 10px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border); position: sticky; top:0; z-index:10;
+  gap: 4px;
+}
+header h1 { font-size: 17px; font-weight: 600; white-space: nowrap; }
+header .header-icons { display: flex; align-items: center; gap: 2px; }
+.header-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 3px 5px; color: var(--text); border-radius: 6px; position: relative; }
+.header-btn.accent { color: var(--accent); }
+.points-mini { font-size: 12px; background: var(--accent); color: #fff; border-radius: 10px; padding: 2px 8px; font-weight: 600; white-space: nowrap; }
+.notif-badge { position: absolute; top: -2px; right: -2px; width: 15px; height: 15px; background: var(--warn); color: #fff; border-radius: 50%; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+.notif-badge.hidden { display: none; }
+
+/* ====== 页面切换：display:none → display:block ====== */
+.page { display: none; padding: 12px 16px; }
+.page.active { display: block; }
+.card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 14px; margin-bottom: 10px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+.card h3 { font-size: 14px; margin-bottom: 8px; color: var(--accent); }
+
+/* ====== 任务条目：无对号，纯颜色区分 ====== */
+.task-item {
+  display: flex; align-items: center; padding: 6px 10px;
+  border-radius: 8px; gap: 8px; cursor: pointer; transition: .15s;
+  margin-bottom: 2px; font-size: 14px;
+}
+.task-item.pending { background: var(--incomplete-bg); color: var(--incomplete-text); }
+.task-item.done-item { color: var(--text); font-weight: 500; }
+.task-item.overdue { background: var(--overdue-bg); color: var(--overdue-text); } /* 逾期：红色背景 */
+.task-circle {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: .15s;
+}
+.task-circle.done { background: var(--done); border-color: var(--done); color: #fff; }       /* ● 绿 */
+.task-circle.deadline { background: var(--warn); border-color: var(--warn); color: #fff; }   /* 🔴 红 */
+.task-circle.overdue-c { color: var(--warn); font-size: 15px; border-color: var(--warn); }  /* ⚠️ 逾期 */
+.task-name { flex:1; }
+.substep-item { font-size: 13px; padding: 4px 10px 4px 32px; }
+.substep-item::before { content: '— '; color: var(--muted); }
+.delete-btn { background: none; border: none; color: var(--muted); font-size: 17px; cursor: pointer; padding: 0 3px; }
+
+/* ====== 按钮 ====== */
+.btn { background: var(--btn); color: var(--btn-text); border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer; font-weight: 500; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-outline { background: transparent; color: var(--btn); border: 1px solid var(--btn); }
+.btn-block { display: block; width: 100%; text-align: center; }
+.btn-danger { background: var(--warn); }
+.muted { color: var(--muted); font-size: 12px; }
+
+/* ====== 表单 ====== */
+.add-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.add-row input, .add-row select { flex:1; border: 1px solid var(--border); border-radius: 8px; padding: 7px 8px; font-size: 13px; background: var(--bg); color: var(--text); min-width: 0; }
+.form-group { margin-bottom: 8px; }
+.form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+.form-group input, .form-group select { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-size: 13px; background: var(--bg); color: var(--text); }
+.form-row { display: flex; gap: 6px; }
+.form-row > * { flex:1; }
+/* 浅灰色占位文字（placeholder） */
+input::placeholder { color: var(--muted); font-size: 12px; }
+
+/* ====== 喝水 ====== */
+.water-dot { display: inline-block; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; transition: .15s; margin: 0 2px; }
+.water-dot.filled { background: var(--accent); border-color: var(--accent); }
+.water-dot.readonly { cursor: default; }
+
+/* ====== 极简模块 ====== */
+.focus-block { background: var(--card); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.focus-date { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.focus-top { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+.focus-streaks { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.focus-streak-chip { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.streak-btn { font-size: 12px; padding: 0 6px; border-radius: 50%; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--muted); }
+.streak-btn.done { background: var(--done); color: #fff; border-color: var(--done); }
+.focus-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+.focus-pill { font-size: 12px; padding: 4px 10px; border-radius: 14px; background: var(--incomplete-bg); color: var(--incomplete-text); cursor: pointer; border: none; }
+.focus-pill.done { background: var(--done); color: #fff; }
+
+/* ====== 逾期提示区（首页极简模块上方） ====== */
+.overdue-area { margin-bottom: 10px; }
+.overdue-item { background: var(--overdue-bg); color: var(--overdue-text); font-size: 13px; padding: 8px 12px; border-radius: 8px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; border: 1px solid var(--warn); }
+
+/* ====== 连续页面：点阵 ====== */
+.dot-matrix { display: flex; gap: 3px; flex-wrap: wrap; margin: 4px 0; }
+.dot-matrix .dm-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--border); }
+.dot-matrix .dm-dot.filled { background: var(--done); }
+
+/* ====== 连续习惯进度条 ====== */
+.streak-bar-bg { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.streak-bar-fg { height: 100%; background: var(--done); border-radius: 4px; transition: width .5s; }
+
+/* ====== 冲刺 ====== */
+.sprint-timer { font-size: 36px; text-align: center; font-weight: 700; margin: 16px 0; color: var(--accent); }
+.sprint-goal { text-align: center; font-size: 16px; color: var(--text); margin-bottom: 16px; }
+.sprint-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+.sprint-ring-container { position: relative; width: 160px; height: 160px; margin: 0 auto; }
+.sprint-ring-container svg { transform: rotate(-90deg); }
+.sprint-ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+.sprint-ring-fg { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset .3s, stroke .5s; }
+
+/* ====== 日历 ====== */
+.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cal-nav button { background: none; border: none; font-size: 17px; cursor: pointer; color: var(--text); padding: 4px 6px; }
+.cal-nav span { font-weight: 600; font-size: 14px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.cal-header { font-size: 11px; color: var(--muted); padding: 4px 0; }
+.cal-cell { padding: 5px 1px; border-radius: 8px; cursor: pointer; font-size: 13px; min-height: 32px; position: relative; }
+.cal-cell:hover { background: var(--border); }
+.cal-cell.today { background: var(--accent); color: #fff; font-weight: 600; }
+.cal-cell.selected { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cal-cell .dots { display: flex; justify-content: center; gap: 3px; margin-top: 1px; }
+.cal-cell .dot { width: 4px; height: 4px; border-radius: 50%; }
+.cal-cell .dot.task-done { background: var(--done); }
+.cal-cell .dot.event { background: var(--accent); }
+.cal-cell.today .dot.task-done, .cal-cell.today .dot.event { background: #fff; }
+
+/* ====== 通知横幅 ====== */
+.notif-area { position: fixed; top: 48px; left: 50%; transform: translateX(-50%); max-width: 500px; width: 100%; z-index: 99; }
+.notif-banner { background: var(--card); border-left: 4px solid var(--accent); padding: 10px 14px; margin: 3px 14px; border-radius: 8px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 8px; animation: slideDown .3s ease; font-size: 13px; }
+.notif-banner .msg { flex:1; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+/* ====== Toast ====== */
+.toast { position: fixed; top: 50px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--card); padding: 7px 18px; border-radius: 20px; font-size: 13px; z-index: 100; opacity: 0; transition: opacity .3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+/* ====== 底部导航 ====== */
+.bottom-nav { position: fixed; bottom:0; left:50%; transform: translateX(-50%); max-width: 500px; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 6px 0; z-index: 10; }
+.nav-item { background: none; border: none; color: var(--muted); font-size: 10px; cursor: pointer; padding: 3px 0; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.nav-item .icon { font-size: 20px; }
+.nav-item.cur { color: var(--accent); }
+
+/* ====== PWA 安装 ====== */
+.install-banner { background: var(--accent); color: #fff; padding: 6px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+.install-banner button { background: #fff; color: var(--accent); border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.install-banner.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div id="installBanner" class="install-banner hidden">
+  <span>添加到桌面，随时打开</span>
+  <button onclick="promptInstall()">安装</button>
+</div>
+
+<header>
+  <h1>日常管理</h1>
+  <div class="header-icons">
+    <!-- ← 返回按钮：页面跳转后自动出现，点击回到上一页 -->
+    <button class="header-btn" id="backBtn" onclick="goBack()" title="返回" style="font-size:18px;visibility:hidden;">←</button>
+    <!-- ✏️/👁️ 编辑/日常模式切换，仅当天和未来日期可用，过往日期锁住 -->
+    <button class="header-btn" id="editToggle" onclick="toggleEditMode()" title="编辑/日常" style="font-size:18px;">✏️</button>
+    <!-- 🔥 连续习惯追踪页面 -->
+    <button class="header-btn" onclick="switchTab('streaks')" title="连续习惯" style="font-size:18px;">🔥</button>
+    <!-- 🔔 日程管理（通知记录已移至首页底部） -->
+    <button class="header-btn" onclick="switchTab('notifications')" title="日程管理" style="position:relative;font-size:18px;">🔔<span class="notif-badge hidden" id="notifBadge">0</span></button>
+    <!-- 🌙/☀️ 夜间模式切换，可手动或自动 -->
+    <button class="header-btn" onclick="toggleNightMode()" title="夜间模式" id="nightToggle" style="font-size:18px;">🌙</button>
+    <!-- 🏪 积分店铺 -->
+    <button class="header-btn" onclick="switchTab('shop')" title="店铺" style="font-size:18px;">🏪</button>
+    <!-- ⚙ 设置 -->
+    <button class="header-btn" onclick="switchTab('settings')" title="设置" style="font-size:18px;">⚙</button>
+    <span class="points-mini" id="headerPoints">0</span>
+  </div>
+</header>
+
+<div id="notifArea" class="notif-area"></div>
+<div id="toast" class="toast"></div>
+
+<!-- ====== ① 日历首页（默认） ====== -->
+<div class="page active" id="page-calendar">
+  <!-- 逾期任务区：截止/逾期未完成的任务在这里标红显示 -->
+  <div class="overdue-area" id="overdueArea"></div>
+  <!-- 极简模块：日期 → 今日最重要 → 连续习惯 → 营养品 → 喝水 -->
+  <div class="focus-block">
+    <div class="focus-date" id="focusDate"></div>
+    <div class="focus-top" id="focusTopTask">—</div>
+    <div class="focus-streaks" id="focusStreaks"></div>
+    <div class="focus-pills" id="focusNutrition"></div>
+    <div style="margin-top:4px;" id="focusWater"></div>
+  </div>
+  <!-- 日历格子 -->
+  <div class="card">
+    <div class="cal-nav">
+      <button onclick="changeCalMonth(-1)">←</button>
+      <span id="calMonthLabel"></span>
+      <button onclick="changeCalMonth(1)">→</button>
+      <button class="btn btn-sm" onclick="goCalToday()">今天</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+  <!-- 通知记录（从旧通知页移至首页底部） -->
+  <div class="card" id="homeNotifCard">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <h3 style="margin:0;">通知记录</h3>
+      <button class="btn btn-sm btn-outline" onclick="clearAllNotif()">清空</button>
+    </div>
+    <div id="homeNotifLog"></div>
+  </div>
+</div>
+
+<!-- ====== ② 日详情页（点日历日期进入） ====== -->
+<div class="page" id="page-day">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <button class="btn btn-sm btn-outline" onclick="switchTab('calendar')">← 日历</button>
+      <strong id="dayDetailTitle"></strong>
+      <button class="btn btn-sm" id="dayEditToggleBtn" onclick="toggleDayEdit()" style="visibility:hidden;">✏️</button>
+    </div>
+    <div class="section-label" style="font-size:14px;font-weight:600;color:var(--text);">📋 日常任务</div>
+    <div id="dayDetailTasks" style="max-height:420px;overflow-y:auto;"></div>
+    <div class="section-label" style="font-size:14px;font-weight:600;color:var(--text);margin-top:12px;">📅 日程</div>
+    <div id="dayDetailEvents"></div>
+    <div class="section-label" style="margin-top:8px;color:var(--accent);" id="dayDetailPoints"></div>
+  </div>
+</div>
+
+<!-- ====== ③ 冲刺 ====== -->
+<div class="page" id="page-sprint">
+  <div class="card" style="text-align:center">
+    <h3>冲刺模式</h3>
+    <p class="sprint-goal" id="sprintGoal">设定一个目标</p>
+    <p class="muted" id="sprintDuration">60 分钟</p>
+    <div class="sprint-ring-container" id="sprintRingContainer">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle class="sprint-ring-bg" cx="80" cy="80" r="70"/>
+        <circle class="sprint-ring-fg" id="sprintRing" cx="80" cy="80" r="70" stroke="var(--sprint-ring)" stroke-dasharray="439.8" stroke-dashoffset="0"/>
+      </svg>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+        <div style="font-size:28px;font-weight:700;" id="sprintTimer">--:--</div>
+      </div>
+    </div>
+    <div class="sprint-buttons">
+      <button class="btn" id="sprintStartBtn" onclick="startSprint()">开始</button>
+      <button class="btn btn-outline" id="sprintDoneBtn" onclick="finishSprint()" style="display:none">完成 +5</button>
+      <button class="btn btn-outline btn-danger" id="sprintQuitBtn" onclick="quitSprint()" style="display:none">退出</button>
+    </div>
+    <div class="add-row" style="margin-top:14px">
+      <input id="sprintGoalInput" placeholder="目标">
+      <input id="sprintDurInput" placeholder="分钟" type="number" style="max-width:70px">
+      <button class="btn btn-sm" onclick="saveSprintConfig()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ④ 店铺 ====== -->
+<div class="page" id="page-shop">
+  <div class="card">
+    <h3>店铺</h3>
+    <p style="font-size:22px;font-weight:700;color:var(--accent);" id="shopPoints">0 分</p>
+    <div id="shopRewardList"></div>
+    <div class="add-row">
+      <input id="shopRewardName" placeholder="想好怎么犒劳自己了吗？" style="flex:2;">
+      <span style="font-size:12px;display:flex;align-items:center;gap:2px;">每周<input id="shopRewardFreq" type="number" value="2" style="width:40px;border:1px solid var(--border);border-radius:6px;padding:4px;text-align:center;background:var(--bg);color:var(--text);">次</span>
+      <button class="btn btn-sm" onclick="addShopReward()" title="自动定价">+</button>
+    </div>
+    <p class="muted" style="margin-top:4px;">设频率 → 系统自动建议积分</p>
+  </div>
+  <div class="card" id="shopRedemptionLogCard" style="display:none;">
+    <h3>兑换记录</h3>
+    <div id="shopRedemptionLog"></div>
+  </div>
+</div>
+
+<!-- ====== ⑤ 连续习惯 ====== -->
+<div class="page" id="page-streaks">
+  <div class="card">
+    <h3>连续习惯</h3>
+    <div id="streakList"></div>
+    <div class="add-row" id="streakAddRow">
+      <input id="streakNameInput" placeholder="新习惯名称">
+      <input id="streakTargetInput" placeholder="目标天数" type="number" style="max-width:80px;">
+      <button class="btn btn-sm" onclick="addStreakItem()">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ⑥ 日程管理（原通知页） ====== -->
+<div class="page" id="page-notifications">
+  <div class="card">
+    <h3>日程</h3>
+    <div id="schedList"></div>
+  </div>
+  <div class="card">
+    <h3>添加日程</h3>
+    <div class="add-row">
+      <input id="schedTitle" placeholder="日程标题">
+      <input type="date" id="schedDate">
+      <input type="time" id="schedTime" style="flex:0.8;">
+    </div>
+    <div style="margin-top:6px;">
+      <select id="schedRepeat" onchange="schedRepeatChange()" style="border:1px solid var(--border);border-radius:8px;padding:6px;font-size:12px;background:var(--bg);color:var(--text);margin-right:6px;">
+        <option value="none">不重复</option><option value="daily">每天</option><option value="weekly">每周</option><option value="monthly">每月</option>
+      </select>
+      <span id="schedRepeatDetail" style="font-size:12px;"></span>
+      <button class="btn btn-sm" onclick="addSchedule()" style="margin-left:6px;">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ⑦ 设置 ====== -->
+<div class="page" id="page-settings">
+  <div class="card">
+    <h3>主题颜色</h3>
+    <div id="themeSelect" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  </div>
+  <div class="card">
+    <h3>夜间模式</h3>
+    <div class="form-row">
+      <div class="form-group"><label>自动切换</label><select id="nightAuto" onchange="updateNightAuto()"><option value="0">手动</option><option value="1">自动</option></select></div>
+      <div class="form-group"><label>开始</label><input type="time" id="nightStart" value="20:00" onchange="updateNightAuto()"></div>
+      <div class="form-group"><label>结束</label><input type="time" id="nightEnd" value="07:00" onchange="updateNightAuto()"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>提醒设置</h3>
+    <div class="form-row">
+      <div class="form-group"><label>提醒</label><select id="reminderEnabled" onchange="updateReminder('enabled',this.value)"><option value="1">开</option><option value="0">关</option></select></div>
+      <div class="form-group"><label>声音</label><select id="reminderSound" onchange="updateReminder('sound_enabled',this.value)"><option value="1">开</option><option value="0">关</option></select></div>
+      <div class="form-group"><label>提前(分)</label><input type="number" value="5" id="reminderAdvance" onchange="updateReminder('advance_minutes',this.value)"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>积分规则</h3>
+    <div id="pointsRulesForm"></div>
+  </div>
+  <div class="card">
+    <h3>极简模块显示项</h3>
+    <div id="focusConfigForm"></div>
+  </div>
+  <div class="card">
+    <h3>营养品默认模板</h3>
+    <div id="nutritionTemplateList"></div>
+    <div class="add-row">
+      <input id="nutNameInput" placeholder="名称">
+      <input id="nutWhenInput" placeholder="时段描述">
+      <input type="time" id="nutTimeHint">
+      <button class="btn btn-sm" onclick="addNutritionTemplate()">+</button>
+    </div>
+    <div style="margin-top:8px;">
+      <span class="muted">每周休息日:</span>
+      <select id="restDay" onchange="updateRestDay()" style="border:1px solid var(--border);border-radius:6px;padding:4px;background:var(--bg);color:var(--text);margin-left:4px;">
+        <option value="">无</option><option value="0">周日</option><option value="1">周一</option><option value="2">周二</option><option value="3">周三</option><option value="4">周四</option><option value="5">周五</option><option value="6">周六</option>
+      </select>
+    </div>
+  </div>
+  <div class="card">
+    <h3>数据</h3>
+    <button class="btn btn-sm" onclick="exportData()">导出数据</button>
+    <button class="btn btn-sm btn-outline" onclick="document.getElementById('importFile').click()" style="margin-left:6px">导入数据</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="btn btn-sm btn-danger" onclick="if(confirm('确定清除所有数据？')){clearData()}" style="margin-left:6px">清除数据</button>
+  </div>
+</div>
+
+<!-- ====== 底部导航 ====== -->
+<nav class="bottom-nav">
+  <button class="nav-item cur" onclick="switchTab('calendar')" data-tab="calendar"><span class="icon">📅</span>日历</button>
+  <button class="nav-item" onclick="switchTab('sprint')" data-tab="sprint"><span class="icon">⚡</span>冲刺</button>
+  <button class="nav-item" onclick="switchTab('shop')" data-tab="shop"><span class="icon">🏪</span>店铺</button>
+  <button class="nav-item" onclick="switchTab('settings')" data-tab="settings"><span class="icon">⚙</span>设置</button>
+</nav>
+
+<script>
+/* ==================================================================================
+   日常管理 PWA — 完整脚本
+   数据全部存储在 localStorage，无需后端。
+   页面结构：日历首页 ① → 日详情 ② → 冲刺 ③ → 店铺 ④ → 连续 ⑤ → 日程管理 ⑥ → 设置 ⑦
+   页眉按钮：←(返回栈) ✏️(编辑模式) 🔥(连续) 🔔(日程) 🌙(夜间) 🏪(店铺) ⚙(设置) 积分
+   ================================================================================== */
+
+// ====== 工具函数：localStorage 读写 ======
+var STORAGE = localStorage;
+// TODAY 是今天的 ISO 日期字符串，如 "2026-06-17"
+var TODAY = (function(){ var d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+var WEEKDAYS = ['日','一','二','三','四','五','六'];
+
+function load(key, def) { try { var v = STORAGE.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+function save(key, val) { STORAGE.setItem(key, JSON.stringify(val)); }
+
+// ====== 全局设置 ======
+var settings = load('settings', {
+  theme:'默认',
+  points_rules:{ daily_task:10, weekly_task:35, nutrition:2, water:1, sprint_done:5 },
+  photo_interval:3
+});
+var nightMode = load('night_mode', { enabled:false, auto:false, auto_start:'20:00', auto_end:'07:00' });
+var reminderSettings = load('reminder_settings', { enabled:true, supplement_reminders:true, golden_time_reminders:true, calendar_reminders:true, sound_enabled:true, advance_minutes:5, last_check:'' });
+// 极简模块显示配置：date=日期, top_task=今日最重要, streaks=连续习惯, nutrition=营养品, water=喝水
+var focusModeConfig = load('focus_mode_config', { items:['date','top_task','streaks','nutrition','water'] });
+var restDay = load('rest_day', ''); // 每周休息日: ''=无, '0'=周日 ... '6'=周六
+
+// ====== 日常任务 ======
+// 每个任务: { id, name, task_type:'daily'|'weekly', weekly_target, substeps:[{name,priority}], max_days, created_date }
+// max_days: 截止天数（从创建日起算），null=无截止
+// created_date: 创建日期，用于计算 deadline = created_date + max_days
+var tasks = load('tasks', []);
+var taskRecords = load('task_records', {});  // { 'YYYY-MM-DD': { done:{id:bool}, points:{id:pts}, substeps:{taskId:{si:bool}} } }
+var pointRecords = load('point_records', {}); // { 'YYYY-MM-DD': totalPointsForDay }
+
+// ====== 营养品 ======
+// 默认模板：用户自配，每天自动套用。可单日删减（nutritionSkips），休息日全部跳过
+var nutritions = load('nutritions', []);
+var nutritionRecords = load('nutrition_records', {}); // { 'YYYY-MM-DD': { name: true/false } }
+var nutritionSkips = load('nutrition_skips', {});       // { 'YYYY-MM-DD': [name, ...] }
+
+// ====== 喝水 ======
+var waterRecords = load('water_records', {}); // { 'YYYY-MM-DD': cupsCount }
+
+// ====== 冲刺模式 ======
+var sprintCfg = load('sprint_config', { goal:'设定一个目标', duration_min:60 });
+var sprintLog = load('sprint_log', []);
+var sprintTimer = null, sprintStartTime = null, sprintTotalSec = 0;
+
+// ====== 店铺（积分奖励） ======
+var rewards = load('rewards', []);
+var redemptionLog = load('redemption_log', []); // 兑换历史
+
+// ====== 连续习惯（独立打卡系统，和日常任务无关） ======
+// 每个习惯: { id, name, icon, start_date, end_date } 起止日期区间
+// streakRecords: { 'YYYY-MM-DD': { [streakId]: true/false } }
+// streakPointAwarded: { 'YYYY-MM-DD': { [streakId]: true/false } } 防重复加分
+var streaks = load('streaks', []);
+var streakRecords = load('streak_records', {});
+var streakPointAwarded = load('streak_point_awarded', {}); // 防重复加分
+var streakRewards = load('streak_rewards', {}); // { 'bonus_<streakId>_<end_date>': true } 完成全部区间后 +10 分
+
+/* 迁移旧 streak 数据：target_days → start_date/end_date */
+(function migrateStreaks(){
+  var changed = false;
+  streaks.forEach(function(s){
+    if (!s.start_date || !s.end_date) {
+      s.start_date = TODAY;
+      var e = new Date(); e.setDate(e.getDate() + ((s.target_days||21) - 1));
+      s.end_date = e.toISOString().slice(0,10);
+      delete s.target_days;
+      changed = true;
+    }
+  });
+  if (changed) save('streaks',streaks);
+})();
+
+// ====== 日程 & 通知 ======
+var calendarEvents = load('calendar_events', []); // 日程列表: { id, title, date, time, repeat, notified }
+var goldenTimes = load('golden_times', { morning_focus:'10:00', lunch_prep:'11:30', after_lunch:'12:30', wrap_up:'15:00' });
+var notificationLog = load('notification_log', []); // 通知历史: { id, type, title, message, timestamp, read }
+
+// ====== 页面状态 ======
+var calYear, calMonth, calSelected = TODAY; // 日历当前视图和选中日期
+var editMode = false; // 编辑模式/日常模式，仅当天和未来可切换
+var currentTab = 'calendar'; // 当前页面
+var pageStack = []; // 返回栈，页面跳转时记录来路
+var schedRepeatDays = []; // 日程「每周」：选中的星期几（0=日..6=六）
+var starredTask = load('starred_task', {}); // { 'YYYY-MM-DD': taskId } 今日星标任务
+
+// ====== 初始化：页面加载时执行 ======
+(function(){
+  try {
+  var d = new Date(); calYear = d.getFullYear(); calMonth = d.getMonth() + 1;
+  applyTheme(settings.theme);
+  if (nightMode.auto) checkNightAuto();
+  if (nightMode.enabled) document.body.classList.add('night');
+  updateNightToggle();
+  document.getElementById('restDay').value = restDay;
+  updateEditToggle();
+  startReminderEngine();
+  renderCalendar();
+  updatePointsUI();
+  } catch(e) { document.getElementById('page-calendar').innerHTML = '<div class="card"><h3>启动错误</h3><p style="color:var(--warn);">'+e.message+'</p><p class="muted">行: '+e.lineNumber+'</p></div>'; return; }
+  // PWA：注册 Service Worker + 监听安装提示
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+    window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); window._deferredPrompt = e; document.getElementById('installBanner').classList.remove('hidden'); });
+    if (window.matchMedia('(display-mode: standalone)').matches) document.getElementById('installBanner').classList.add('hidden');
+  }
+  // 定时更新时间和夜间模式
+  setInterval(function(){
+    if (nightMode.auto) checkNightAuto();
+    updateTimeDisplay();
+  }, 30000);
+  updateTimeDisplay();
+})();
+
+// ====== 主题 & 夜间模式 ======
+/*
+   四个日间主题（默认/森林/暖橙/极简）+ 夜间模式独立于主题。
+   夜间模式叠加 body.night 类，CSS 变量覆盖为深色值。
+*/
+function applyTheme(name) {
+  document.body.className = '';
+  var map = {'默认':'','森林':'theme-forest','暖橙':'theme-warm','极简':'theme-minimal'};
+  if (map[name]) document.body.classList.add(map[name]);
+  if (nightMode.enabled) document.body.classList.add('night');
+}
+function toggleNightMode() { nightMode.enabled = !nightMode.enabled; save('night_mode',nightMode); if (nightMode.enabled) document.body.classList.add('night'); else document.body.classList.remove('night'); updateNightToggle(); }
+function updateNightToggle() { document.getElementById('nightToggle').textContent = nightMode.enabled ? '☀️' : '🌙'; }
+/*
+   自动夜间模式：根据设定的开始/结束时间自动切换。
+   跨夜逻辑：如果 start > end（如 20:00~07:00），则当前时间 >= start 或 < end 时为夜间。
+*/
+function checkNightAuto() {
+  var now = new Date(), cur = now.getHours()*60+now.getMinutes();
+  var start = parseInt(nightMode.auto_start.split(':')[0])*60+parseInt(nightMode.auto_start.split(':')[1]);
+  var end = parseInt(nightMode.auto_end.split(':')[0])*60+parseInt(nightMode.auto_end.split(':')[1]);
+  var should = start > end ? (cur >= start || cur < end) : (cur >= start && cur < end);
+  if (should !== nightMode.enabled) { nightMode.enabled = should; save('night_mode',nightMode); if (nightMode.enabled) document.body.classList.add('night'); else document.body.classList.remove('night'); updateNightToggle(); }
+}
+function updateNightAuto() { nightMode.auto = document.getElementById('nightAuto').value==='1'; nightMode.auto_start = document.getElementById('nightStart').value; nightMode.auto_end = document.getElementById('nightEnd').value; save('night_mode',nightMode); }
+
+// ====== Toast 提示 ======
+function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 1500); }
+
+// ====== 编辑模式 ======
+/*
+   日常模式 = 只读 + 打卡，编辑模式 = 可增删改。
+   过往日期强制只读（editMode 无法打开），页眉按钮显示 🔒。
+*/
+function toggleEditMode() {
+  if (calSelected < TODAY) { toast('过往日期仅可查看'); return; }
+  editMode = !editMode;
+  updateEditToggle();
+  if (currentTab === 'day') renderDayDetail(); else renderCalendar();
+}
+function updateEditToggle() {
+  var btn = document.getElementById('editToggle');
+  if (calSelected < TODAY) { btn.textContent = '🔒'; btn.title = '过往日期只读'; btn.style.opacity = '0.5'; editMode = false; }
+  else { btn.textContent = editMode ? '👁️' : '✏️'; btn.title = editMode ? '切换日常模式' : '切换编辑模式'; btn.style.opacity = '1'; }
+}
+
+// ====== 页面跳转 + 返回栈 ======
+/*
+   每次 switchTab 把当前页推入 pageStack，实现「从哪来的回哪去」。
+   页眉 ← 按钮在有历史记录时自动出现。
+   夜间模式 🌙 和编辑模式 ✏️ 不触发跳转，不推栈。
+*/
+function switchTab(tab) {
+  if (tab !== currentTab) { pageStack.push(currentTab); if (pageStack.length > 20) pageStack.shift(); }
+  currentTab = tab;
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  var page = document.getElementById('page-'+tab); if (page) page.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('cur'); if (n.dataset.tab===tab) n.classList.add('cur'); });
+  if (tab === 'calendar') renderCalendar();
+  else if (tab === 'sprint') renderSprint();
+  else if (tab === 'shop') renderShop();
+  else if (tab === 'streaks') renderStreaksPage();
+  else if (tab === 'settings') renderSettings();
+  else if (tab === 'notifications') renderSchedulePage();
+  else if (tab === 'day') renderDayDetail();
+  window.scrollTo(0,0);
+  updateBackBtn();
+}
+function goBack() {
+  var prev = pageStack.pop();
+  if (!prev) return;
+  currentTab = prev;
+  switchTab(prev);
+}
+function updateBackBtn() {
+  var btn = document.getElementById('backBtn');
+  if (!btn) return;
+  btn.style.visibility = pageStack.length > 0 ? 'visible' : 'hidden';
+}
+
+// ====== 积分系统 ======
+function addPoints(pts, key) { if (!pointRecords[TODAY]) pointRecords[TODAY] = 0; pointRecords[TODAY] += pts; save('point_records',pointRecords); updatePointsUI(); }
+function totalPoints() { return Object.values(pointRecords).reduce(function(a,b){return a+b;},0); }
+function avgDailyPoints() {
+  var keys = Object.keys(pointRecords); if (!keys.length) return 0;
+  var total = 0; keys.forEach(function(k){ total += pointRecords[k]; });
+  var sorted = keys.sort(), first = sorted[0], last = sorted[sorted.length-1];
+  var days = Math.max(1, Math.ceil((new Date(last)-new Date(first))/86400000) + 1);
+  return Math.round(total / days);
+}
+function updatePointsUI() { document.getElementById('headerPoints').textContent = totalPoints(); }
+
+// ====== 日历首页 ① ======
+/*
+   从上到下：逾期任务区 → 极简模块 → 日历格子 → 通知记录
+*/
+function renderCalendar() {
+  updateEditToggle();
+  renderOverdueArea();  // 逾期任务：截止/逾期未完成的标红
+  renderFocusBlock();   // 极简模块
+  document.getElementById('calMonthLabel').textContent = calYear+'年 '+calMonth+'月';
+  var firstDay = new Date(calYear,calMonth-1,1).getDay(), daysInMonth = new Date(calYear,calMonth,0).getDate();
+  var html = ''; WEEKDAYS.forEach(function(h){ html += '<div class="cal-header">'+h+'</div>'; });
+  for (var i = 0; i < firstDay; i++) html += '<div class="cal-cell"></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = calYear+'-'+String(calMonth).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var isToday = ds === TODAY, isSel = ds === calSelected;
+    var tr = taskRecords[ds], hasTask = tr && Object.values(tr.done||{}).filter(Boolean).length > 0;
+    var hasEvent = calendarEvents.some(function(e){ return e.date === ds; });
+    html += '<div class="cal-cell'+(isToday?' today':'')+(isSel?' selected':'')+'" onclick="selectCalDay(\''+ds+'\')">'+d;
+    if (hasTask || hasEvent) html += '<div class="dots">'+(hasTask?'<div class="dot task-done"></div>':'')+(hasEvent?'<div class="dot event"></div>':'')+'</div>';
+    html += '</div>';
+  }
+  document.getElementById('calGrid').innerHTML = html;
+  renderNotifLog(); // 首页底部通知记录
+}
+/*
+   点击日历日期 → 跳转到日详情页 ②
+*/
+function selectCalDay(ds) { calSelected = ds; if (ds < TODAY) { editMode = false; } updateEditToggle(); switchTab('day'); }
+function changeCalMonth(dir) { calMonth += dir; if (calMonth<1){calMonth=12;calYear--;} else if(calMonth>12){calMonth=1;calYear++;} renderCalendar(); }
+function goCalToday() { var d = new Date(); calYear = d.getFullYear(); calMonth = d.getMonth()+1; calSelected = TODAY; renderCalendar(); }
+
+/* ====== 逾期任务区 ======
+   遍历所有任务，检查哪些设置了截止天数且未完成。
+   deadline = created_date + max_days。如果 deadline <= TODAY 且未完成 → 显示。
+*/
+function renderOverdueArea() {
+  var overdue = [];
+  tasks.forEach(function(t){
+    if (!t.max_days || !t.created_date) return;
+    var created = new Date(t.created_date);
+    var deadline = new Date(created); deadline.setDate(deadline.getDate() + t.max_days);
+    var dk = deadline.getFullYear()+'-'+String(deadline.getMonth()+1).padStart(2,'0')+'-'+String(deadline.getDate()).padStart(2,'0');
+    if (dk > TODAY) return; // 还没到截止日
+    var done = (taskRecords[dk]||{}).done||{};
+    if (done[String(t.id)]) return; // 已按时完成
+    // 检查是否后面某天完成了
+    var doneLater = false;
+    for (var di = new Date(dk); di.toISOString().slice(0,10) <= TODAY; di.setDate(di.getDate()+1)) {
+      var diKey = di.getFullYear()+'-'+String(di.getMonth()+1).padStart(2,'0')+'-'+String(di.getDate()).padStart(2,'0');
+      if (((taskRecords[diKey]||{}).done||{})[String(t.id)]) { doneLater = true; break; }
+    }
+    if (doneLater) return;
+    // 显示逾期
+    var overdueDays = Math.floor((new Date(TODAY) - deadline) / 86400000);
+    var label = overdueDays === 0 ? '今天截止' : ('逾期 '+overdueDays+' 天');
+    overdue.push({ task:t, label:label, deadline:dk });
+  });
+  if (!overdue.length) { document.getElementById('overdueArea').innerHTML = ''; return; }
+  overdue.sort(function(a,b){ return a.deadline.localeCompare(b.deadline); });
+  var html = '';
+  overdue.forEach(function(o){
+    html += '<div class="overdue-item">⚠ '+esc(o.task.name)+' <span style="font-size:11px;">'+o.label+' 截止 '+o.deadline+'</span></div>';
+  });
+  document.getElementById('overdueArea').innerHTML = html;
+}
+
+/* ====== 极简模块 ======
+   根据 focusModeConfig.items 决定显示哪些项。
+   连续习惯项显示名称+天数+打卡按钮 [○]/[✓]。
+*/
+function updateTimeDisplay() {
+  var d = new Date(calSelected||TODAY);
+  document.getElementById('focusDate').textContent = (d.getMonth()+1)+'月'+d.getDate()+'日 星期'+WEEKDAYS[d.getDay()];
+}
+function renderFocusBlock() {
+  updateTimeDisplay();
+  var ds = calSelected||TODAY, isPast = ds < TODAY;
+  var config = focusModeConfig.items;
+  /* 今日最重要：星标任务 */
+  if (config.indexOf('top_task') !== -1) {
+    var starId = starredTask[ds] || null, topText = '暂无星标';
+    if (starId) {
+      var starT = tasks.find(function(t){return t.id===starId;});
+      if (starT) {
+        var starDone = ((taskRecords[ds]||{}).done||{})[String(starId)] || false;
+        topText = '<span style=\"color:#f0b800;\">★</span> '+starT.name+(starDone?' ✓':'');
+      }
+    }
+    document.getElementById('focusTopTask').innerHTML = topText;
+  } else { document.getElementById('focusTopTask').innerHTML = ''; }
+  // 连续习惯：名称+进度百分比+打卡按钮
+  if (config.indexOf('streaks') !== -1) {
+    var shtml = ''; streaks.forEach(function(s){
+      var info = computeStreak(s);
+      var todayDone = (streakRecords[TODAY]||{})[s.id] || false;
+      shtml += '<span class="focus-streak-chip">'+s.icon+s.name+' '+info.pct+'% ';
+      if (!isPast) shtml += '<button class="streak-btn'+(todayDone?' done':'')+'" onclick="event.stopPropagation();toggleStreakDay('+s.id+')">'+(todayDone?'✓':'○')+'</button>';
+      shtml += '</span>';
+    });
+    document.getElementById('focusStreaks').innerHTML = shtml;
+  } else { document.getElementById('focusStreaks').innerHTML = ''; }
+  document.getElementById('focusNutrition').innerHTML = '';
+  // 喝水
+  if (config.indexOf('water') !== -1) {
+    var water = waterRecords[ds]||0, whtml = '💧 ';
+    for (var i = 0; i < 6; i++) whtml += '<span class="water-dot'+(i<water?' filled':'')+(isPast?' readonly':'')+'" onclick="'+'addWaterInFocus(\''+ds+'\','+(i+1)+(isPast?',true':'')+')"></span>';
+    whtml += ' <span class="muted">'+(water||0)+'/6</span>';
+    document.getElementById('focusWater').innerHTML = whtml;
+  } else { document.getElementById('focusWater').innerHTML = ''; }
+}
+function toggleNutritionInFocus(ds, name) { if (ds < TODAY) return; var today = nutritionRecords[ds]||{}; if (!nutritionRecords[ds]) nutritionRecords[ds] = {}; if (today[name]) { today[name] = false; } else { today[name] = true; addPoints(settings.points_rules.nutrition||2,'nutrition_'+ds+'_'+name); } save('nutrition_records',nutritionRecords); renderFocusBlock(); if (currentTab==='day') renderDayDetail(); }
+function addWaterInFocus(ds, n, isPast) { if (isPast) return; var prev = waterRecords[ds]||0; if (n <= prev) return; waterRecords[ds] = n; save('water_records',waterRecords); if (n <= 6) addPoints(settings.points_rules.water||1,'water_'+ds+'_'+n); renderFocusBlock(); if (currentTab==='day') renderDayDetail(); }
+
+// ====== 日详情页 ② ======
+/*
+   日常任务 → 日程 → 积分。
+   编辑模式：☆/★ 星标（★=今日最重要，首页极简模块显示）、× 删除母子任务、[+] 加子步骤。
+   日常模式（只读）：只显示 ★ 星标任务，其余无星。
+   过往日期只读。
+*/
+/* 任务列表带滚动容器 */
+function renderDayDetail() {
+  var ds = calSelected, isPast = ds < TODAY;
+  if (isPast) { editMode = false; }
+  var canEdit = !isPast && editMode;
+  var starId = starredTask[ds] || null; // 今日星标任务 ID
+  document.getElementById('dayDetailTitle').textContent = ds + (isPast ? '（过往记录）' : (editMode ? '（编辑中）' : ''));
+  var btn = document.getElementById('dayEditToggleBtn');
+  if (isPast) { btn.style.visibility = 'hidden'; }
+  else { btn.style.visibility = 'visible'; btn.textContent = editMode ? '👁️' : '✏️'; }
+
+  /* 星标任务排第一，其余按 order 排序 */
+  var sorted = tasks.slice().sort(function(a,b){ return (a.order||0) - (b.order||0); });
+  if (starId) {
+    var si = -1; for (var i = 0; i < sorted.length; i++) { if (sorted[i].id === starId) { si = i; break; } }
+    if (si > 0) { var starItem = sorted.splice(si,1)[0]; sorted.unshift(starItem); }
+  }
+  var tr = taskRecords[ds]; if (!tr) tr = {done:{},substeps:{}};
+
+  var thtml = '';
+  sorted.forEach(function(t,idx){
+    var tDone = (tr.done||{})[String(t.id)] || false;
+    var dlInfo = getDeadlineInfo(t, ds);
+    var dlText = t.max_days && t.created_date ? getDeadlineText(t) : '';
+    var statusText = tDone ? '✓ 完成啦' : (dlInfo==='overdue'?'逾期':(dlInfo==='today'?'今天截止':'待处理'));
+
+    /* 子任务全完成判断：所有子任务完成母任务才算完成 */
+    var allSubDone = false;
+    if (t.substeps && t.substeps.length) {
+      var ssRec = (tr.substeps||{})[String(t.id)]||{};
+      allSubDone = t.substeps.every(function(ss,si){ return ssRec[si]||false; });
+    }
+
+    var parentDone = tDone || (t.substeps && t.substeps.length > 0 && allSubDone);
+    var circleCls = parentDone ? 'done' : (dlInfo==='today'?'deadline':(dlInfo==='overdue'?'overdue-c':''));
+    var circleContent = parentDone ? '●' : (dlInfo==='overdue'?'⚠':(dlInfo==='today'?'🔴':'○'));
+    var rowCls = parentDone ? 'done-item' : (dlInfo==='overdue'||dlInfo==='today'?'overdue':'pending');
+
+    /* 星标：编辑模式全部显示 ☆/★，日常模式只显示 ★ */
+    var isStar = t.id === starId;
+    thtml += '<div class="task-item '+rowCls+'">';
+    if (canEdit) {
+      // 编辑模式：☆空心/★实心，点击切换星标（同时取消其他）
+      thtml += '<span style="cursor:pointer;font-size:16px;'+(isStar?'color:#f0b800;':'color:var(--muted);')+'" onclick="toggleTaskStar('+t.id+')">'+(isStar?'★':'☆')+'</span>';
+    } else if (isStar) {
+      // 日常模式：只有星标任务显示 ★
+      thtml += '<span style="color:#f0b800;font-size:16px;">★</span>';
+    }
+    thtml += '<span class="task-circle '+circleCls+'" onclick="dayToggleParent(\''+ds+'\','+t.id+')" style="cursor:pointer;">'+circleContent+'</span>';
+    thtml += '<span class="task-name">'+esc(t.name)+(parentDone?' <span style="color:var(--done);">✓ 完成啦</span>':'')+'</span>';
+    if (dlText) thtml += '<span style="font-size:12px;color:var(--muted);">截止 '+dlText+'</span>';
+    thtml += '<span style="font-size:12px;color:'+(parentDone?'var(--done)':(dlInfo==='overdue'||dlInfo==='today'?'var(--warn)':'var(--muted)'))+';">'+statusText+'</span>';
+    /* × 删除：仅编辑模式，确认后删除母任务+子任务 */
+    if (canEdit) {
+      thtml += '<button class="delete-btn" onclick="event.stopPropagation();if(confirm(\'删除「'+esc(t.name)+'」及其子任务？\')){deleteTaskById('+t.id+');}" style="font-size:14px;">×</button>';
+    }
+    thtml += '</div>';
+
+    /* 子任务渲染 */
+    if (t.substeps && t.substeps.length) {
+      var ssRec = (tr.substeps||{})[String(t.id)]||{};
+      t.substeps.forEach(function(ss,si){
+        var ssDone = ssRec[si]||false;
+        var ssDlInfo = getDeadlineInfoSS(ss, ds);
+        var ssDlText = ss.max_days && ss.created_date ? getDeadlineTextSS(ss) : '';
+        var ssStatusText = ssDone ? '✓ 完成啦' : (ssDlInfo==='overdue'?'逾期':(ssDlInfo==='today'?'今天截止':'待处理'));
+        var ssCircleCls = ssDone?'done':(ssDlInfo==='today'?'deadline':(ssDlInfo==='overdue'?'overdue-c':''));
+        var ssCircleContent = ssDone?'●':(ssDlInfo==='overdue'?'⚠':(ssDlInfo==='today'?'🔴':'○'));
+        var ssRowCls = ssDone?'done-item':(ssDlInfo==='overdue'||ssDlInfo==='today'?'overdue':'pending');
+        thtml += '<div class="task-item substep-item '+ssRowCls+'">';
+        thtml += '<span class="task-circle '+ssCircleCls+'" onclick="dayToggleSubstep(\''+ds+'\','+t.id+','+si+')" style="cursor:pointer;">'+ssCircleContent+'</span>';
+        thtml += '<span class="task-name">'+esc(ss.name)+(ssDone?' <span style="color:var(--done);">✓ 完成啦</span>':'')+'</span>';
+        if (ssDlText) thtml += '<span style="font-size:12px;color:var(--muted);">截止 '+ssDlText+'</span>';
+        thtml += '<span style="font-size:12px;color:'+(ssDone?'var(--done)':(ssDlInfo==='overdue'||ssDlInfo==='today'?'var(--warn)':'var(--muted)'))+';">'+ssStatusText+'</span>';
+        if (canEdit) thtml += '<button class="delete-btn" onclick="event.stopPropagation();removeSubstep('+t.id+','+si+');" style="font-size:14px;">×</button>';
+        thtml += '</div>';
+      });
+    }
+
+    /* +/− 子步骤表单：仅编辑模式，+展开/−清空收回 */
+    if (canEdit && !isPast) {
+      thtml += '<div style="padding-left:24px;"><button class="btn btn-sm btn-outline" id="ssBtn_'+t.id+'" onclick="event.stopPropagation();showSubstepForm('+t.id+')" style="font-size:18px;padding:0 8px;line-height:1;">+</button>';
+      thtml += '<div class="add-row" id="ssForm_'+t.id+'" style="display:none;padding-top:4px;"><input id="ssInput_'+t.id+'" placeholder="具体是什么呢？" style="flex:2;font-size:12px;"><input id="ssDays_'+t.id+'" type="number" placeholder="天数" style="max-width:45px;font-size:12px;"><button class="btn btn-sm" onclick="addSubstepToTask('+t.id+')">+</button></div></div>';
+    }
+  });
+
+  /* 添加新任务表单：仅编辑模式 */
+  if (canEdit && !isPast) {
+    thtml += '<div class="add-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">';
+    thtml += '<input id="dayTaskInput" placeholder="新日常任务..." style="flex:3;">';
+    thtml += '<input id="dayTaskMaxDays" type="number" placeholder="天数" style="max-width:50px;">';
+    thtml += '<button class="btn btn-sm" onclick="dayAddTask()">+</button></div>';
+  }
+
+  document.getElementById('dayDetailTasks').innerHTML = thtml;
+
+  /* 日程 */
+  var dayEvents = calendarEvents.filter(function(e){ return e.date === ds; });
+  var ehtml = '';
+  dayEvents.forEach(function(e){
+    ehtml += '<div style="font-size:13px;padding:3px 0;">'+(e.time?e.time+' ':'全天 ')+esc(e.title);
+    if (e.repeat !== 'none') ehtml += ' <span class="muted">每'+{daily:'天',weekly:'周',monthly:'月'}[e.repeat]+'</span>';
+    ehtml += '</div>';
+  });
+  if (!dayEvents.length) ehtml += '<p class="muted">暂无日程 · 点🔔添加</p>';
+  document.getElementById('dayDetailEvents').innerHTML = ehtml;
+
+  var pts = pointRecords[ds]||0;
+  document.getElementById('dayDetailPoints').textContent = '积分: '+pts;
+}
+
+/* 截止日期文本 */
+function getDeadlineText(t) {
+  var d = new Date(t.created_date); d.setDate(d.getDate()+t.max_days);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function getDeadlineTextSS(ss) {
+  var d = new Date(ss.created_date); d.setDate(d.getDate()+ss.max_days);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function getDeadlineInfo(t, ds) {
+  if (!t.max_days || !t.created_date) return null;
+  var created = new Date(t.created_date);
+  if (ds < created.toISOString().slice(0,10)) return null;
+  var deadline = new Date(created); deadline.setDate(deadline.getDate() + t.max_days);
+  var dk = deadline.getFullYear()+'-'+String(deadline.getMonth()+1).padStart(2,'0')+'-'+String(deadline.getDate()).padStart(2,'0');
+  if (ds < dk) return 'normal';
+  if (ds === dk) return 'today';
+  return 'overdue';
+}
+function getDeadlineInfoSS(ss, ds) {
+  if (!ss.max_days || !ss.created_date) return null;
+  var created = new Date(ss.created_date);
+  if (ds < created.toISOString().slice(0,10)) return null;
+  var deadline = new Date(created); deadline.setDate(deadline.getDate() + ss.max_days);
+  var dk = deadline.getFullYear()+'-'+String(deadline.getMonth()+1).padStart(2,'0')+'-'+String(deadline.getDate()).padStart(2,'0');
+  if (ds < dk) return 'normal';
+  if (ds === dk) return 'today';
+  return 'overdue';
+}
+
+function toggleDayEdit() { if (calSelected < TODAY) return; editMode = !editMode; renderDayDetail(); }
+
+/* 星标切换：将某任务设为今日最重要（同时取消其他星标） */
+function toggleTaskStar(id) {
+  if (calSelected < TODAY) return;
+  if (starredTask[calSelected] === id) {
+    delete starredTask[calSelected]; // 取消星标
+  } else {
+    starredTask[calSelected] = id; // 设为星标（自动覆盖之前的）
+  }
+  save('starred_task',starredTask);
+  renderDayDetail(); renderFocusBlock();
+}
+
+/* 母任务切换：子任务全完成时自动完成母任务 */
+function dayToggleParent(ds, id) {
+  if (ds < TODAY) return;
+  var task = tasks.find(function(t){return t.id===id;}); if (!task) return;
+  if (task.substeps && task.substeps.length) {
+    var tr = taskRecords[ds]; if (!tr||!(tr.substeps||{})[id]) { toast('请先完成所有子任务'); return; }
+    var allDone = task.substeps.every(function(ss,si){ return (tr.substeps[id]||{})[si]||false; });
+    if (!allDone) { toast('请先完成所有子任务'); return; }
+  }
+  dayToggleTask(ds, id);
+}
+
+function dayToggleTask(ds, id) {
+  if (ds < TODAY) return;
+  var tr = taskRecords[ds]; if (!tr) { tr = {done:{},points:{}}; taskRecords[ds] = tr; }
+  var key = String(id);
+  if (tr.done[key]) { tr.done[key] = false; var pts = tr.points[key]||0; tr.points[key] = 0; if (pointRecords[ds]){pointRecords[ds]=Math.max(0,(pointRecords[ds]||0)-pts);save('point_records',pointRecords);} }
+  else { tr.done[key] = true; var pts = (settings.points_rules.daily_task||10); tr.points[key] = pts; addPoints(pts,'task_'+ds+'_'+id); }
+  save('task_records',taskRecords); renderDayDetail(); renderFocusBlock(); renderOverdueArea(); renderCalendar();
+}
+function dayToggleSubstep(ds, taskId, si) {
+  if (ds < TODAY) return;
+  var tr = taskRecords[ds]; if (!tr) { tr = {done:{},substeps:{}}; taskRecords[ds] = tr; }
+  if (!tr.substeps) tr.substeps = {}; if (!tr.substeps[taskId]) tr.substeps[taskId] = {};
+  tr.substeps[taskId][si] = !tr.substeps[taskId][si];
+  save('task_records',taskRecords); renderDayDetail();
+}
+
+/* 添加任务：去掉每日/周选择，只留名称+截止天数 */
+function dayAddTask() {
+  var inp = document.getElementById('dayTaskInput'); if (!inp) return;
+  var name = inp.value.trim(); if (!name) return;
+  var maxDays = parseInt(document.getElementById('dayTaskMaxDays').value) || null;
+  var id = Math.max(0, tasks.reduce(function(m,t){return Math.max(m,t.id);},0)) + 1;
+  var maxOrder = 0; tasks.forEach(function(t){ maxOrder = Math.max(maxOrder, t.order||0); });
+  tasks.push({id:id,name:name,task_type:'daily',substeps:[],max_days:maxDays,created_date:maxDays?TODAY:null,order:maxOrder+1});
+  save('tasks',tasks);
+  inp.value = ''; document.getElementById('dayTaskMaxDays').value = '';
+  renderDayDetail(); renderFocusBlock(); renderOverdueArea(); renderCalendar(); toast('已添加「'+name+'」');
+}
+
+/* +/− 切换子步骤表单：+展开 → −收回并清空输入 */
+function showSubstepForm(taskId) {
+  var form = document.getElementById('ssForm_'+taskId);
+  var btn = document.getElementById('ssBtn_'+taskId);
+  if (!form || !btn) return;
+  if (form.style.display === 'none' || form.style.display === '') {
+    /* 展开表单，+ 变 − */
+    form.style.display = 'flex'; btn.textContent = '−';
+  } else {
+    /* 收回表单，清空输入，− 变 + */
+    form.style.display = 'none'; btn.textContent = '+';
+    var inp = document.getElementById('ssInput_'+taskId); if (inp) inp.value = '';
+    var daysInp = document.getElementById('ssDays_'+taskId); if (daysInp) daysInp.value = '';
+  }
+}
+
+/* 添加子步骤：保存后重置按钮为 + */
+function addSubstepToTask(taskId) {
+  var inp = document.getElementById('ssInput_'+taskId), daysInp = document.getElementById('ssDays_'+taskId);
+  if (!inp) return;
+  var name = inp.value.trim(); if (!name) return;
+  var maxDays = parseInt(daysInp.value) || null;
+  var task = tasks.find(function(t){return t.id===taskId;}); if (!task) return;
+  if (!task.substeps) task.substeps = [];
+  task.substeps.push({name:name,priority:task.substeps.length+1,max_days:maxDays,created_date:maxDays?TODAY:null});
+  save('tasks',tasks); inp.value = ''; if (daysInp) daysInp.value = '';
+  /* 收起表单，按钮变回 + */
+  var form = document.getElementById('ssForm_'+taskId); if (form) form.style.display = 'none';
+  var btn = document.getElementById('ssBtn_'+taskId); if (btn) btn.textContent = '+';
+  renderDayDetail(); toast('已添加子步骤');
+}
+function removeSubstep(taskId, si) {
+  var task = tasks.find(function(t){return t.id===taskId;}); if (!task||!task.substeps) return;
+  task.substeps.splice(si,1); save('tasks',tasks); renderDayDetail();
+}
+/* 删除母任务及其所有子任务 */
+function deleteTaskById(id) { tasks = tasks.filter(function(t){return t.id!==id;}); save('tasks',tasks); renderDayDetail(); renderFocusBlock(); renderCalendar(); }
+
+/* 添加新任务：名称+截止天数 */
+function dayAddTask() {
+  var inp = document.getElementById('dayTaskInput'); if (!inp) return;
+  var name = inp.value.trim(); if (!name) return;
+  var taskType = document.getElementById('dayTaskType').value;
+  var weeklyTarget = taskType === 'weekly' ? (parseInt(document.getElementById('dayWeeklyTarget').value) || 3) : null;
+  var maxDays = parseInt(document.getElementById('dayTaskMaxDays').value) || null;
+  var id = Math.max(0, tasks.reduce(function(m,t){return Math.max(m,t.id);},0)) + 1;
+  var substeps = daySubstepTemp.slice(); daySubstepTemp = [];
+  tasks.push({id:id,name:name,task_type:taskType,weekly_target:weeklyTarget,substeps:substeps,max_days:maxDays,created_date:maxDays?TODAY:null});
+  save('tasks',tasks);
+  inp.value = ''; document.getElementById('dayWeeklyTarget').value = ''; document.getElementById('dayTaskMaxDays').value = '';
+  document.getElementById('daySubstepArea').style.display = 'none';
+  renderDayDetail(); renderFocusBlock(); renderCalendar(); toast('已添加「'+name+'」');
+}
+function deleteTask(i) { var t = tasks[i]; tasks.splice(i,1); save('tasks',tasks); renderDayDetail(); renderFocusBlock(); renderCalendar(); toast('已删除「'+t.name+'」'); }
+
+// --- 健康操作 ---
+function dayToggleNutrition(ds, name) { if (ds < TODAY) return; var today = nutritionRecords[ds]||{}; if (!nutritionRecords[ds]) nutritionRecords[ds] = {}; if (today[name]) { today[name] = false; } else { today[name] = true; addPoints(settings.points_rules.nutrition||2,'nutrition_'+ds+'_'+name); } save('nutrition_records',nutritionRecords); renderDayDetail(); renderFocusBlock(); }
+function dayAddWater(ds, n, isPast) { if (isPast) return; var prev = waterRecords[ds]||0; if (n <= prev) return; waterRecords[ds] = n; save('water_records',waterRecords); if (n <= 6) addPoints(settings.points_rules.water||1,'water_'+ds+'_'+n); renderDayDetail(); renderFocusBlock(); }
+
+// ====== 冲刺模式 ③ ======
+/* 环形计时器：B 阶段变色 + C 透明度渐变 */
+function renderSprint() {
+  document.getElementById('sprintGoal').textContent = sprintCfg.goal || '设定一个目标';
+  document.getElementById('sprintDuration').textContent = (sprintCfg.duration_min||60)+' 分钟';
+  document.getElementById('sprintGoalInput').value = sprintCfg.goal || '';
+  document.getElementById('sprintDurInput').value = sprintCfg.duration_min || 60;
+  if (!sprintTimer) {
+    document.getElementById('sprintTimer').textContent = '--:--';
+    document.getElementById('sprintStartBtn').style.display = ''; document.getElementById('sprintDoneBtn').style.display = 'none'; document.getElementById('sprintQuitBtn').style.display = 'none';
+    document.getElementById('sprintRing').setAttribute('stroke-dashoffset','0'); document.getElementById('sprintRing').setAttribute('stroke','var(--sprint-ring)'); document.getElementById('sprintRing').style.opacity = '1';
+  }
+}
+function saveSprintConfig() { var g = document.getElementById('sprintGoalInput').value.trim(), d = parseInt(document.getElementById('sprintDurInput').value)||60; if(g)sprintCfg.goal=g; sprintCfg.duration_min=d; save('sprint_config',sprintCfg); renderSprint(); toast('已保存'); }
+function startSprint() {
+  sprintStartTime = Date.now(); sprintTotalSec = (sprintCfg.duration_min||60)*60;
+  var total = sprintTotalSec, circ = 439.8;
+  document.getElementById('sprintStartBtn').style.display = 'none'; document.getElementById('sprintDoneBtn').style.display = ''; document.getElementById('sprintQuitBtn').style.display = '';
+  document.getElementById('sprintRing').setAttribute('stroke-dasharray',circ);
+  updateSprintDisplay(total);
+  sprintTimer = setInterval(function(){ var el = Math.floor((Date.now()-sprintStartTime)/1000), rem = total - el; if (rem <= 0) { finishSprint(); return; } updateSprintDisplay(rem); }, 200);
+}
+function updateSprintDisplay(sec) {
+  var m = Math.floor(sec/60), s = sec%60;
+  document.getElementById('sprintTimer').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  var prog = sec/sprintTotalSec, circ = 439.8, offset = circ*(1-prog), ring = document.getElementById('sprintRing');
+  ring.setAttribute('stroke-dashoffset',offset); ring.style.opacity = 0.3+prog*0.7;
+  var color = prog > 0.5 ? 'var(--sprint-ring)' : (prog > 0.2 ? 'var(--sprint-ring-warn)' : 'var(--sprint-ring-urgent)');
+  ring.setAttribute('stroke',color);
+}
+function finishSprint() {
+  if (sprintTimer) { clearInterval(sprintTimer); sprintTimer = null; }
+  sprintLog.push({date:TODAY,time:new Date().toTimeString().slice(0,5),goal:sprintCfg.goal}); save('sprint_log',sprintLog);
+  addPoints(settings.points_rules.sprint_done||5,'sprint_'+TODAY); sprintStartTime = null;
+  document.getElementById('sprintTimer').textContent = '--:--'; document.getElementById('sprintStartBtn').style.display = ''; document.getElementById('sprintDoneBtn').style.display = 'none'; document.getElementById('sprintQuitBtn').style.display = 'none';
+  document.getElementById('sprintRing').setAttribute('stroke-dashoffset','0'); document.getElementById('sprintRing').setAttribute('stroke','var(--sprint-ring)'); document.getElementById('sprintRing').style.opacity = '1';
+  toast('冲刺完成 +'+(settings.points_rules.sprint_done||5)); updatePointsUI();
+}
+function quitSprint() {
+  if (sprintTimer) { clearInterval(sprintTimer); sprintTimer = null; }
+  document.getElementById('sprintTimer').textContent = '--:--'; document.getElementById('sprintStartBtn').style.display = ''; document.getElementById('sprintDoneBtn').style.display = 'none'; document.getElementById('sprintQuitBtn').style.display = 'none';
+  document.getElementById('sprintRing').setAttribute('stroke-dashoffset','0'); document.getElementById('sprintRing').setAttribute('stroke','var(--sprint-ring)'); document.getElementById('sprintRing').style.opacity = '1';
+  sprintStartTime = null; toast('冲刺中断');
+}
+
+// ====== 店铺 ④ ======
+/* 奖励自动定价：用户设频率 → 系统用日均积分计算建议价格 */
+function renderShop() {
+  var total = totalPoints();
+  document.getElementById('shopPoints').textContent = total+' 分';
+  var html = ''; rewards.forEach(function(r,i){
+    var afford = total >= r.cost;
+    html += '<div class="reward-item" onclick="redeemReward('+i+')" style="'+(afford?'':'opacity:0.5')+'"><span style="flex:1;">'+esc(r.name)+'</span><span class="muted">'+r.cost+' 分</span>';
+    if (r.frequency_per_week) html += '<span class="muted" style="font-size:11px;">每周'+r.frequency_per_week+'次</span>';
+    html += '<button class="delete-btn" onclick="event.stopPropagation();deleteReward('+i+')">×</button></div>';
+  });
+  document.getElementById('shopRewardList').innerHTML = html || '<p class="muted">暂无奖励</p>';
+  var rhtml = ''; redemptionLog.slice().reverse().forEach(function(r){ rhtml += '<div style="font-size:13px;padding:3px 0;">'+r.date+' '+esc(r.reward)+' <span class="muted">-'+r.cost+'</span></div>'; });
+  document.getElementById('shopRedemptionLog').innerHTML = rhtml || '<p class="muted">暂无记录</p>';
+  document.getElementById('shopRedemptionLogCard').style.display = redemptionLog.length ? '' : 'none';
+}
+function addShopReward() {
+  var name = document.getElementById('shopRewardName').value.trim(), freq = parseFloat(document.getElementById('shopRewardFreq').value);
+  if (!name || !freq) return;
+  var avg = avgDailyPoints() || 50;
+  var suggested = Math.round(avg * (7 / freq));
+  var cost = parseInt(prompt('建议 '+suggested+' 分（日均 '+avg+' 分 × '+(7/freq).toFixed(1)+' 天）\n确认或输入新值：', suggested));
+  if (!cost || cost <= 0) return;
+  rewards.push({name:name,cost:cost,frequency_per_week:freq}); save('rewards',rewards);
+  document.getElementById('shopRewardName').value = ''; document.getElementById('shopRewardFreq').value = '2';
+  renderShop(); toast('已添加「'+name+'」('+cost+' 分)');
+}
+function deleteReward(i) { rewards.splice(i,1); save('rewards',rewards); renderShop(); }
+function redeemReward(i) {
+  var total = totalPoints(); if (total < rewards[i].cost) { toast('积分不足'); return; }
+  var cost = rewards[i].cost, remaining = cost;
+  var keys = Object.keys(pointRecords).sort(function(a,b){ return b.localeCompare(a); });
+  for (var ki = 0; ki < keys.length; ki++) { if (remaining<=0) break; var deduct = Math.min(pointRecords[keys[ki]],remaining); pointRecords[keys[ki]] -= deduct; remaining -= deduct; }
+  save('point_records',pointRecords);
+  redemptionLog.push({date:TODAY,reward:rewards[i].name,cost:cost}); save('redemption_log',redemptionLog);
+  updatePointsUI(); renderShop(); toast('已兑换「'+rewards[i].name+'」');
+}
+
+// ====== 连续习惯 ⑤ ======
+/*
+   独立于日常任务。手动打卡，点阵显示已完成天数。
+   点阵：● 绿 = 已打卡，○ 灰 = 未打卡。总点数 = 目标天数。
+   规则：1分/天，达到目标天数 +10分（仅一次）。
+*/
+/* 迁移旧数据 + 计算习惯在起止日期区间内的完成百分比 */
+function computeStreak(s) {
+  /* 兼容旧数据：无 start_date 则用 target_days 推算 */
+  if (!s.start_date || !s.end_date) {
+    if (s.target_days) { s.start_date = TODAY; var e = new Date(); e.setDate(e.getDate()+s.target_days-1); s.end_date = e.toISOString().slice(0,10); }
+    else { s.start_date = TODAY; s.end_date = TODAY; }
+    save('streaks',streaks);
+  }
+  var start = new Date(s.start_date), end = new Date(s.end_date);
+  var totalDays = Math.floor((end - start) / 86400000) + 1; if (totalDays <= 0 || isNaN(totalDays)) return {done:0,total:0,pct:0};
+  var done = 0, d = new Date(start);
+  while (d <= end) {
+    var dk = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if ((streakRecords[dk]||{})[s.id]) done++;
+    d.setDate(d.getDate()+1);
+  }
+  var pct = Math.round(done / totalDays * 100);
+  var bonusKey = 'bonus_'+s.id+'_'+s.end_date;
+  if (pct >= 100 && !streakRewards[bonusKey]) { streakRewards[bonusKey] = true; save('streak_rewards',streakRewards); addPoints(10, 'streak_bonus_'+s.id); toast(s.icon+' '+s.name+' 全部完成！+10分'); }
+  return {done:done,total:totalDays,pct:pct};
+}
+/* 手动打卡：防重复加分 */
+function toggleStreakDay(sid) {
+  if (!streakRecords[TODAY]) streakRecords[TODAY] = {};
+  if (!streakPointAwarded[TODAY]) streakPointAwarded[TODAY] = {};
+  if (streakRecords[TODAY][sid]) {
+    streakRecords[TODAY][sid] = false;
+    if (streakPointAwarded[TODAY][sid] && pointRecords[TODAY]) {
+      pointRecords[TODAY] = Math.max(0, (pointRecords[TODAY]||0) - 1);
+      save('point_records',pointRecords); updatePointsUI();
+    }
+    streakPointAwarded[TODAY][sid] = false;
+  } else {
+    streakRecords[TODAY][sid] = true;
+    if (!streakPointAwarded[TODAY][sid]) {
+      streakPointAwarded[TODAY][sid] = true;
+      addPoints(1, 'streak_'+sid+'_'+TODAY);
+    }
+  }
+  save('streak_records',streakRecords);
+  save('streak_point_awarded',streakPointAwarded);
+  renderFocusBlock();
+  if (currentTab === 'streaks') renderStreaksPage();
+}
+/* 连续习惯页面：进度条 + 起止日期 */
+function renderStreaksPage() {
+  var html = '';
+  streaks.forEach(function(s,i){
+    var info = computeStreak(s);
+    html += '<div style="margin-bottom:14px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><span style="font-size:14px;font-weight:500;">'+s.icon+' '+esc(s.name)+'</span><span style="font-weight:600;color:var(--accent);">'+info.pct+'%</span></div>';
+    html += '<div class="streak-bar-bg"><div class="streak-bar-fg" style="width:'+info.pct+'%"></div></div>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;"><span class="muted">'+s.start_date+' ~ '+s.end_date+' · '+info.done+'/'+info.total+' 天</span>';
+    html += '<button class="delete-btn" onclick="deleteStreakItem('+i+')">×</button></div>';
+    html += '</div>';
+  });
+  if (!streaks.length) html = '<p class="muted">暂无连续习惯</p>';
+  document.getElementById('streakList').innerHTML = html;
+}
+function addStreakItem() {
+  var name = document.getElementById('streakNameInput').value.trim(), target = parseInt(document.getElementById('streakTargetInput').value)||21;
+  if (!name) return;
+  var id = Math.max(0, streaks.reduce(function(m,s){return Math.max(m,s.id);},0)) + 1;
+  var start = TODAY;
+  var end = new Date(); end.setDate(end.getDate() + target - 1);
+  var endStr = end.getFullYear()+'-'+String(end.getMonth()+1).padStart(2,'0')+'-'+String(end.getDate()).padStart(2,'0');
+  streaks.push({id:id,name:name,icon:'🔸',start_date:start,end_date:endStr}); save('streaks',streaks);
+  document.getElementById('streakNameInput').value = ''; document.getElementById('streakTargetInput').value = '';
+  renderStreaksPage(); renderFocusBlock(); toast('已添加「'+name+'」');
+}
+function deleteStreakItem(i) { var s = streaks[i]; streaks.splice(i,1); save('streaks',streaks); renderStreaksPage(); renderFocusBlock(); toast('已删除「'+s.name+'」'); }
+
+// ====== 日程管理 ⑥ ======
+/* 日程按日期排序。每周可选星期几，每月可选几号。到点触发通知。 */
+function renderSchedulePage() {
+  var html = '';
+  var sorted = calendarEvents.slice().sort(function(a,b){ return a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||''); });
+  sorted.forEach(function(e){
+    html += '<div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">';
+    html += '<span>'+e.date+' '+(e.time||'全天')+' '+esc(e.title)+(e.repeat!=='none'?' <span class="muted">每'+{daily:'天',weekly:'周',monthly:'月'}[e.repeat]+'</span>':'')+'</span>';
+    html += '<button class="delete-btn" onclick="deleteSchedule('+e.id+')">×</button></div>';
+  });
+  document.getElementById('schedList').innerHTML = html || '<p class="muted">暂无日程</p>';
+  schedRepeatChange(); // 刷新重复选项的详细 UI
+}
+/* 根据选中的重复类型，动态显示「每周几」或「每月几号」选择器 */
+function schedRepeatChange() {
+  var val = document.getElementById('schedRepeat').value, detail = document.getElementById('schedRepeatDetail');
+  if (val === 'weekly') {
+    var dayNames = ['周日','周一','周二','周三','周四','周五','周六'];
+    var html = ''; dayNames.forEach(function(dn,i){ html += '<label style="margin-left:4px;font-size:12px;"><input type="checkbox" value="'+i+'"'+(schedRepeatDays.indexOf(i)!==-1?' checked':'')+' onchange="schedRepeatDays=[];var cbs=document.querySelectorAll(\'#schedRepeatDetail input\');cbs.forEach(function(cb){if(cb.checked)schedRepeatDays.push(parseInt(cb.value));});">'+dn+'</label>'; });
+    detail.innerHTML = html;
+  } else if (val === 'monthly') {
+    detail.innerHTML = '<span style="font-size:12px;margin-left:4px;">每月 <input type="number" id="schedMonthDay" value="1" min="1" max="31" style="width:50px;border:1px solid var(--border);border-radius:6px;padding:4px;text-align:center;background:var(--bg);color:var(--text);"> 号</span>';
+  } else { detail.innerHTML = ''; }
+}
+function addSchedule() {
+  var title = document.getElementById('schedTitle').value.trim(); if (!title) return;
+  var date = document.getElementById('schedDate').value || TODAY;
+  var time = document.getElementById('schedTime').value;
+  var repeat = document.getElementById('schedRepeat').value;
+  var repeatDetail = repeat === 'weekly' ? schedRepeatDays.join(',') : (repeat === 'monthly' ? (document.getElementById('schedMonthDay')||{}).value||'1' : '');
+  var id = Math.max(0, calendarEvents.reduce(function(m,e){return Math.max(m,e.id);},0)) + 1;
+  calendarEvents.push({id:id,title:title,date:date,time:time,type:'event',repeat:repeat,repeatDetail:repeatDetail,notified:false});
+  save('calendar_events',calendarEvents);
+  document.getElementById('schedTitle').value = ''; document.getElementById('schedTime').value = '';
+  renderSchedulePage(); renderCalendar(); toast('已添加日程');
+}
+function deleteSchedule(id) { calendarEvents = calendarEvents.filter(function(e){ return e.id !== id; }); save('calendar_events',calendarEvents); renderSchedulePage(); renderCalendar(); }
+
+// ====== 通知记录（首页底部 + 提醒引擎） ======
+function renderNotifLog() {
+  var html = '';
+  notificationLog.slice().reverse().forEach(function(n,i){
+    var idx = notificationLog.length - 1 - i;
+    html += '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;display:flex;justify-content:space-between;align-items:flex-start;">';
+    html += '<div><strong>'+esc(n.title)+'</strong> <span class="muted">'+n.timestamp+'</span><br>'+esc(n.message)+'</div>';
+    html += '<button class="delete-btn" onclick="deleteNotif('+idx+')" style="flex-shrink:0;">×</button></div>';
+    if (!n.read){n.read=true;}
+  });
+  var target = document.getElementById('homeNotifLog'); if (target) target.innerHTML = html || '<p class="muted">暂无通知</p>';
+  save('notification_log',notificationLog); updateNotifBadge();
+}
+function clearAllNotif() { if (confirm('清空所有通知？')) { notificationLog = []; save('notification_log',notificationLog); renderNotifLog(); } }
+function deleteNotif(i) { notificationLog.splice(i,1); save('notification_log',notificationLog); renderNotifLog(); }
+/* 提醒引擎：每30秒检查一次，对比当前时间 vs 营养品/黄金时段/日程 */
+function startReminderEngine() {
+  if (!reminderSettings.enabled) return;
+  checkReminders(); setInterval(checkReminders, 30000);
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible')checkReminders(); });
+}
+function checkReminders() {
+  var now = new Date(), cur = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'), today = TODAY;
+  if (reminderSettings.last_check !== today) { calendarEvents.forEach(function(e){e.notified=false;}); save('calendar_events',calendarEvents); reminderSettings.last_check = today; save('reminder_settings',reminderSettings); }
+  if (reminderSettings.supplement_reminders) {
+    var nutToday = nutritionRecords[TODAY]||{}, isRest = restDay && new Date().getDay()==restDay;
+    nutritions.forEach(function(n){ if (n.time_hint && n.time_hint===cur && !nutToday[n.name] && !isRest) showNotification('supplement',n.name,'该吃「'+n.name+'」了（'+n.when+'）'); });
+  }
+  if (reminderSettings.golden_time_reminders) {
+    var msgs = {morning_focus:{title:'10:00',body:'列出最重要的，趁精力最好的时候做'},lunch_prep:{title:'11:30',body:'准备好简餐'},after_lunch:{title:'12:30',body:'选一件小事帮大脑重启'},wrap_up:{title:'15:00',body:'回顾完成事项'}};
+    for (var k in goldenTimes) { if (goldenTimes[k]===cur) showNotification('golden',msgs[k].title,msgs[k].body); }
+  }
+  if (reminderSettings.calendar_reminders) {
+    calendarEvents.forEach(function(e){ if (e.date===today && e.time===cur && !e.notified) { showNotification('calendar',e.title,'预定: '+e.time); e.notified=true; save('calendar_events',calendarEvents); } });
+  }
+}
+function showNotification(type, title, msg) {
+  var id = Date.now(); notificationLog.unshift({id:id,type:type,title:title,message:msg,timestamp:new Date().toTimeString().slice(0,5),read:false});
+  if (notificationLog.length > 50) notificationLog.length = 50; save('notification_log',notificationLog); updateNotifBadge();
+  var banner = document.createElement('div'); banner.className = 'notif-banner';
+  banner.innerHTML = '<span class="msg"><strong>'+esc(title)+'</strong> '+esc(msg)+'</span><div class="actions"><button class="btn btn-sm btn-outline" onclick="this.parentElement.parentElement.remove()">知道了</button><button class="btn btn-sm" onclick="snoozeNotif(\''+type+'\',\''+esc(msg)+'\');this.parentElement.parentElement.remove()">延后5分</button></div>';
+  document.getElementById('notifArea').appendChild(banner);
+  if (reminderSettings.sound_enabled) playChime();
+  setTimeout(function(){ if (banner.parentElement) banner.remove(); }, 15000);
+}
+function snoozeNotif(type, msg) { setTimeout(function(){ showNotification(type,'延后提醒',msg); }, 300000); }
+function playChime() { try { var ctx = new (window.AudioContext||window.webkitAudioContext)(), osc = ctx.createOscillator(), gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 800; osc.type = 'sine'; gain.gain.setValueAtTime(0.3,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.5); osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.5); } catch(e){} }
+function updateNotifBadge() { var unread = notificationLog.filter(function(n){return !n.read;}).length; var badge = document.getElementById('notifBadge'); badge.textContent = unread; if (unread>0) badge.classList.remove('hidden'); else badge.classList.add('hidden'); }
+function updateReminder(key, val) { reminderSettings[key] = val==='1'?true:(val==='0'?false:parseInt(val)||5); save('reminder_settings',reminderSettings); }
+
+// ====== 设置 ⑦ ======
+function renderSettings() {
+  var themes = ['默认','森林','暖橙','极简'], thtml = '';
+  themes.forEach(function(t){ thtml += '<button class="btn btn-sm '+(settings.theme===t?'':'btn-outline')+'" onclick="setTheme(\''+t+'\')">'+t+'</button>'; });
+  document.getElementById('themeSelect').innerHTML = thtml;
+  var rules = settings.points_rules;
+  document.getElementById('pointsRulesForm').innerHTML =
+    '<div class="form-row"><div class="form-group"><label>每日任务</label><input type="number" value="'+(rules.daily_task||10)+'" onchange="updateRule(\'daily_task\',this.value)"></div><div class="form-group"><label>周常任务</label><input type="number" value="'+(rules.weekly_task||35)+'" onchange="updateRule(\'weekly_task\',this.value)"></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>营养品</label><input type="number" value="'+(rules.nutrition||2)+'" onchange="updateRule(\'nutrition\',this.value)"></div><div class="form-group"><label>喝水</label><input type="number" value="'+(rules.water||1)+'" onchange="updateRule(\'water\',this.value)"></div></div>'+
+    '<div class="form-group"><label>冲刺</label><input type="number" value="'+(rules.sprint_done||5)+'" onchange="updateRule(\'sprint_done\',this.value)" style="width:100px;"></div>';
+  var items = ['date','top_task','streaks','nutrition','water'], labels = {date:'日期',top_task:'今日最重要',streaks:'连续习惯',nutrition:'营养品',water:'喝水'};
+  var fhtml = ''; items.forEach(function(item){ fhtml += '<label style="display:inline-block;margin-right:10px;font-size:13px;"><input type="checkbox" '+(focusModeConfig.items.indexOf(item)!==-1?'checked':'')+' onchange="toggleFocusItem(\''+item+'\')"> '+labels[item]+'</label>'; });
+  document.getElementById('focusConfigForm').innerHTML = fhtml;
+  document.getElementById('nightAuto').value = nightMode.auto ? '1' : '0';
+  document.getElementById('nightStart').value = nightMode.auto_start; document.getElementById('nightEnd').value = nightMode.auto_end;
+  document.getElementById('reminderEnabled').value = reminderSettings.enabled ? '1' : '0';
+  document.getElementById('reminderSound').value = reminderSettings.sound_enabled ? '1' : '0';
+  document.getElementById('reminderAdvance').value = reminderSettings.advance_minutes || 5;
+  document.getElementById('restDay').value = restDay;
+  renderNutritionTemplate();
+}
+function setTheme(name) { settings.theme = name; save('settings',settings); applyTheme(name); renderSettings(); }
+function updateRule(key, val) { var v = parseInt(val); if (v >= 0) { settings.points_rules[key] = v; save('settings',settings); } }
+function toggleFocusItem(item) { var idx = focusModeConfig.items.indexOf(item); if (idx===-1) focusModeConfig.items.push(item); else focusModeConfig.items.splice(idx,1); save('focus_mode_config',focusModeConfig); }
+
+// ====== 营养品模板（设置页内） ======
+function renderNutritionTemplate() {
+  var html = ''; nutritions.forEach(function(n,i){
+    html += '<div class="add-row" style="margin-bottom:4px;"><input value="'+esc(n.name)+'" onchange="updateNutField('+i+',\'name\',this.value)" style="flex:1;"><input value="'+esc(n.when)+'" onchange="updateNutField('+i+',\'when\',this.value)" style="flex:1;"><input type="time" value="'+esc(n.time_hint||'')+'" onchange="updateNutField('+i+',\'time_hint\',this.value)" style="flex:1;"><button class="delete-btn" onclick="deleteNutritionTemplate('+i+')">×</button></div>';
+  });
+  document.getElementById('nutritionTemplateList').innerHTML = html;
+}
+function updateNutField(i, field, val) { nutritions[i][field] = val; save('nutritions',nutritions); }
+function addNutritionTemplate() { var name = document.getElementById('nutNameInput').value.trim(), when = document.getElementById('nutWhenInput').value.trim(), thint = document.getElementById('nutTimeHint').value; if (!name) return; nutritions.push({name:name,when:when,time_hint:thint}); save('nutritions',nutritions); document.getElementById('nutNameInput').value = ''; document.getElementById('nutWhenInput').value = ''; document.getElementById('nutTimeHint').value = ''; renderNutritionTemplate(); toast('已添加「'+name+'」'); }
+function deleteNutritionTemplate(i) { var n = nutritions[i]; nutritions.splice(i,1); save('nutritions',nutritions); renderNutritionTemplate(); toast('已删除「'+n.name+'」'); }
+function updateRestDay() { restDay = document.getElementById('restDay').value; save('rest_day',restDay); }
+
+// ====== 数据导入导出 ======
+function exportData() {
+  var data = {}; for (var i = 0; i < STORAGE.length; i++) { var k = STORAGE.key(i); try { data[k] = JSON.parse(STORAGE.getItem(k)); } catch(e) { data[k] = STORAGE.getItem(k); } }
+  var blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}), a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup_'+TODAY+'.json'; a.click(); toast('已导出');
+}
+function importData(event) {
+  var file = event.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){ try { var data = JSON.parse(e.target.result); for (var k in data) { if (data.hasOwnProperty(k)) STORAGE.setItem(k,typeof data[k]==='string'?data[k]:JSON.stringify(data[k])); } location.reload(); } catch(err) { toast('导入失败'); } };
+  reader.readAsText(file); event.target.value = '';
+}
+function clearData() { STORAGE.clear(); location.reload(); }
+
+// ====== PWA 安装 ======
+function promptInstall() { if (window._deferredPrompt) { window._deferredPrompt.prompt(); window._deferredPrompt.userChoice.then(function(r){ if (r.outcome==='accepted') document.getElementById('installBanner').classList.add('hidden'); window._deferredPrompt = null; }); } }
+
+// ====== HTML 转义 ======
+function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+</script>
+</body>
+</html>
