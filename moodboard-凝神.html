@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>凝神 · UI方向对比</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: -apple-system, "Segoe UI", sans-serif; background:#f0f0f0; padding:20px; }
+h2 { font-size:14px; margin-bottom:12px; color:#555; }
+
+.card { background:#fff; border-radius:16px; padding:24px; margin-bottom:20px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.row { display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; }
+
+/* 共享控件 */
+.timer-ring { position:relative; width:140px; height:140px; flex-shrink:0; }
+.timer-ring svg { transform:rotate(-90deg); }
+.timer-ring .bg { fill:none; stroke-width:8; }
+.timer-ring .fg { fill:none; stroke-width:8; stroke-linecap:round; }
+.timer-ring .text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+.timer-ring .time { font-size:28px; font-weight:700; }
+.timer-ring .label { font-size:11px; margin-top:2px; }
+.buttons { display:flex; gap:8px; margin-top:16px; }
+.btn { border:none; border-radius:20px; padding:8px 18px; font-size:13px; cursor:default; font-weight:500; }
+.info { flex:1; min-width:200px; }
+.info h3 { font-size:15px; margin-bottom:6px; }
+.info p { font-size:12px; color:#888; line-height:1.6; margin-bottom:3px; }
+.palette { display:flex; gap:6px; margin-top:8px; }
+.swatch { width:24px; height:24px; border-radius:50%; border:1px solid rgba(0,0,0,.1); }
+
+/* 休息态 */
+.rest .time { font-size:22px; }
+.rest .label { color:inherit; }
+
+/* ====== A: 水墨 ====== */
+.ink .timer-ring .bg { stroke:#d4cfc8; }
+.ink .timer-ring .fg { stroke:#3a3226; }
+.ink .timer-ring .time { color:#3a3226; }
+.ink .timer-ring .label { color:#9a9488; }
+.ink .btn.play { background:#c43a3a; color:#fff; }       /* 朱砂红 ▶ */
+.ink .btn.stop { background:none; color:#3a3226; border:1px solid #bfb9ae; }
+.ink .btn.done { background:#3a3226; color:#f5f0e8; }
+.ink .info h3 { color:#3a3226; }
+.ink .info .tag { display:inline-block; background:#f5f0e8; color:#8a8070; font-size:11px; padding:2px 8px; border-radius:10px; margin-right:4px; }
+.ink.rest .timer-ring .fg { stroke:#8aac8a; }
+
+/* ====== B: 暮色 ====== */
+.dusk { background:#1e2130; border-radius:16px; color:#e0d8cc; }
+.dusk h2 { color:#a09888; }
+.dusk .timer-ring .bg { stroke:#2e3140; }
+.dusk .timer-ring .fg { stroke:#d4a854; }             /* 暖金 */
+.dusk .timer-ring .time { color:#e0d8cc; }
+.dusk .timer-ring .label { color:#8a8070; }
+.dusk .btn.play { background:#d4a854; color:#1e2130; } /* 暖金实心 */
+.dusk .btn.stop { background:none; color:#a09888; border:1px solid #3a3d48; }
+.dusk .btn.done { background:#3a5a4a; color:#e0d8cc; }
+.dusk .info h3 { color:#e0d8cc; }
+.dusk .info p { color:#7a7060; }
+.dusk .info .tag { display:inline-block; background:#2a2d38; color:#a09888; font-size:11px; padding:2px 8px; border-radius:10px; margin-right:4px; }
+.dusk.rest .timer-ring .fg { stroke:#6a9aac; }
+
+/* ====== C: 竹月 ====== */
+.bamboo .timer-ring .bg { stroke:#d8dfd4; }
+.bamboo .timer-ring .fg { stroke:#7a9a7a; }             /* 竹青 */
+.bamboo .timer-ring .time { color:#3a4a3a; }
+.bamboo .timer-ring .label { color:#9aaa9a; }
+.bamboo .btn.play { background:#7a9a7a; color:#fff; }
+.bamboo .btn.stop { background:none; color:#5a6a5a; border:1px solid #c0d0c0; }
+.bamboo .btn.done { background:#4a5a4a; color:#fff; }
+.bamboo .info h3 { color:#3a4a3a; }
+.bamboo .info .tag { display:inline-block; background:#eaf0e8; color:#7a8a7a; font-size:11px; padding:2px 8px; border-radius:10px; margin-right:4px; }
+.bamboo.rest .timer-ring .fg { stroke:#b0c0c0; }
+
+/* 小标题 */
+.section-title { font-size:16px; font-weight:700; margin-bottom:10px; }
+.subtitle { font-size:13px; color:var(--muted); margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<h1 style="text-align:center;margin-bottom:20px;font-size:18px;">凝神 · 三个 UI 方向</h1>
+
+<!-- ====== 方向 A: 水墨 ====== -->
+<div class="card ink">
+  <div class="section-title">方向 A · 水墨留白</div>
+  <div class="row">
+    <div class="timer-ring">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="62"/>
+        <circle class="fg" cx="70" cy="70" r="62" stroke-dasharray="389.6" stroke-dashoffset="120"/>
+      </svg>
+      <div class="text"><div class="time">18:32</div><div class="label">写月度报告</div></div>
+    </div>
+    <div class="timer-ring rest">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="62"/>
+        <circle class="fg" cx="70" cy="70" r="62" stroke-dasharray="389.6" stroke-dashoffset="120"/>
+      </svg>
+      <div class="text"><div class="time">3:22</div><div class="label">🌿 休息中</div></div>
+    </div>
+    <div class="info">
+      <h3>宣纸墨韵，朱砂点睛</h3>
+      <p>计时环如一笔淡墨勾勒<br>▶ ⏹ 以朱砂红点缀<br>休息环转为淡青瓷色<br>背景大面积留白，安静克制</p>
+      <div class="palette">
+        <span style="font-size:11px;color:#9a9488;margin-right:4px;">色板:</span>
+        <span class="swatch" style="background:#3a3226;"></span>
+        <span class="swatch" style="background:#c43a3a;"></span>
+        <span class="swatch" style="background:#d4cfc8;"></span>
+        <span class="swatch" style="background:#8aac8a;"></span>
+        <span class="swatch" style="background:#f5f0e8;"></span>
+      </div>
+      <div class="buttons">
+        <span class="btn play">▶ 开始</span>
+        <span class="btn stop">⏹</span>
+        <span class="btn done">✓</span>
+      </div>
+      <div style="margin-top:8px;">
+        <span class="tag">📋 整理大纲 ✓</span>
+        <span class="tag">📝 填写数据</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 方向 B: 暮色 ====== -->
+<div class="card dusk">
+  <div class="section-title" style="color:#e0d8cc;">方向 B · 暮色温润</div>
+  <div class="row">
+    <div class="timer-ring">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="62"/>
+        <circle class="fg" cx="70" cy="70" r="62" stroke-dasharray="389.6" stroke-dashoffset="120"/>
+      </svg>
+      <div class="text"><div class="time">18:32</div><div class="label">写月度报告</div></div>
+    </div>
+    <div class="timer-ring rest">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="62"/>
+        <circle class="fg" cx="70" cy="70" r="62" stroke-dasharray="389.6" stroke-dashoffset="120"/>
+      </svg>
+      <div class="text"><div class="time">3:22</div><div class="label">🌿 休息中</div></div>
+    </div>
+    <div class="info">
+      <h3>灯下暮色，暖金流光</h3>
+      <p style="color:#7a7060;">进展环如暮色中的一盏灯<br>暖金色渐变带微弱光晕<br>休息时环色过渡到青蓝<br>专注中背景略微变暗</p>
+      <div class="palette">
+        <span style="font-size:11px;color:#a09888;margin-right:4px;">色板:</span>
+        <span class="swatch" style="background:#d4a854;"></span>
+        <span class="swatch" style="background:#1e2130;"></span>
+        <span class="swatch" style="background:#2e3140;"></span>
+        <span class="swatch" style="background:#6a9aac;"></span>
+        <span class="swatch" style="background:#3a5a4a;"></span>
+      </div>
+      <div class="buttons">
+        <span class="btn play">▶ 开始</span>
+        <span class="btn stop">⏹</span>
+        <span class="btn done">✓</span>
+      </div>
+      <div style="margin-top:8px;">
+        <span class="tag">📋 整理大纲 ✓</span>
+        <span class="tag">📝 填写数据</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 方向 C: 竹月 ====== -->
+<div class="card bamboo">
+  <div class="section-title">方向 C · 竹月</div>
+  <div class="row">
+    <div class="timer-ring">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="62"/>
+        <circle class="fg" cx="70" cy="70" r="62" stroke-dasharray="389.6" stroke-dashoffset="120"/>
+      </svg>
+      <div class="text"><div class="time">18:32</div><div class="label">写月度报告</div></div>
+    </div>
+    <div class="timer-ring rest">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="62"/>
+        <circle class="fg" cx="70" cy="70" r="62" stroke-dasharray="389.6" stroke-dashoffset="120"/>
+      </svg>
+      <div class="text"><div class="time">3:22</div><div class="label">🌿 休息中</div></div>
+    </div>
+    <div class="info">
+      <h3>竹林月下，淡然有生气</h3>
+      <p>计时环为竹青色，低调不刺眼<br>背景纯白/米白，深墨灰（夜间）<br>全低饱和度配色，护眼安静<br>和现有主题系统自然衔接</p>
+      <div class="palette">
+        <span style="font-size:11px;color:#9aaa9a;margin-right:4px;">色板:</span>
+        <span class="swatch" style="background:#7a9a7a;"></span>
+        <span class="swatch" style="background:#eaf0e8;"></span>
+        <span class="swatch" style="background:#d8dfd4;"></span>
+        <span class="swatch" style="background:#b0c0c0;"></span>
+        <span class="swatch" style="background:#3a4a3a;"></span>
+      </div>
+      <div class="buttons">
+        <span class="btn play">▶ 开始</span>
+        <span class="btn stop">⏹</span>
+        <span class="btn done">✓</span>
+      </div>
+      <div style="margin-top:8px;">
+        <span class="tag">📋 整理大纲 ✓</span>
+        <span class="tag">📝 填写数据</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

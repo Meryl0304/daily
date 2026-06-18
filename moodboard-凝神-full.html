@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>凝神 · 完整UI预览</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1e2130; max-width: 420px; margin: 0 auto;
+  min-height: 100vh; padding: 16px; padding-bottom: 80px; color: #e0d8cc;
+}
+
+/* ====== 状态切换 ====== */
+.state-label {
+  display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.state-btn {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; border: 1px solid #3a3d48;
+  background: #2a2d38; color: #a09888; cursor: pointer;
+}
+.state-btn.active { background: #d4a854; color: #1e2130; border-color: #d4a854; font-weight: 600; }
+
+/* ====== 计时页容器 ====== */
+.card {
+  background: #252830; border-radius: 16px; padding: 20px; margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+
+/* ====== 空闲态 ====== */
+.idle-header { text-align: center; margin-bottom: 20px; }
+.idle-header .free-btn {
+  background: transparent; border: 1.5px dashed #5a5550; color: #a09888;
+  border-radius: 14px; padding: 10px 24px; font-size: 14px; cursor: pointer;
+}
+.idle-header .free-btn:hover { border-color: #d4a854; color: #d4a854; }
+
+.task-waiting { margin-bottom: 16px; }
+.task-waiting h3 { font-size: 12px; color: #8a8070; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.wait-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border-radius: 10px; background: #2a2d38; margin-bottom: 6px;
+}
+.wait-item .play-dot {
+  width: 32px; height: 32px; border-radius: 50%; background: #d4a854;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  font-size: 14px; color: #1e2130; flex-shrink: 0;
+}
+.wait-item .info { flex: 1; }
+.wait-item .name { font-size: 14px; font-weight: 500; }
+.wait-item .meta { font-size: 11px; color: #7a7060; }
+.wait-item .est { font-size: 12px; color: #a09888; }
+
+/* 统计 Tab */
+.stats-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.stats-tab {
+  padding: 5px 14px; border-radius: 14px; font-size: 12px; cursor: pointer;
+  border: 1px solid #3a3d48; background: #2a2d38; color: #7a7060;
+}
+.stats-tab.on { background: #3a3d48; color: #e0d8cc; border-color: #5a5850; }
+
+/* 热力图 */
+.heatmap { display: flex; gap: 3px; }
+.heat-col { display: flex; flex-direction: column; gap: 3px; }
+.heat-label { font-size: 8px; color: #5a5850; text-align: center; margin-bottom: 2px; }
+.heat-cell {
+  width: 12px; height: 12px; border-radius: 2px;
+}
+.heat-cell.l0 { background: #2a2d38; }
+.heat-cell.l1 { background: #3a3528; }
+.heat-cell.l2 { background: #5a4a30; }
+.heat-cell.l3 { background: #8a6a38; }
+.heat-cell.l4 { background: #d4a854; }
+.heat-legend { display: flex; gap: 4px; align-items: center; font-size: 9px; color: #5a5850; margin-top: 4px; justify-content: flex-end; }
+
+/* ====== 计时中 ====== */
+.timer-active { text-align: center; }
+.timer-ring-wrap {
+  position: relative; width: 180px; height: 180px; margin: 0 auto 20px;
+}
+.timer-ring-wrap svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: #2e3040; stroke-width: 8; }
+.ring-fg { fill: none; stroke-width: 8; stroke-linecap: round; }
+/* 正常：暖金 */
+.ring-fg.normal { stroke: #d4a854; }
+/* 超时：橙色 */
+.ring-fg.overtime { stroke: #e08040; }
+.ring-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  text-align: center;
+}
+.ring-center .time-big { font-size: 40px; font-weight: 700; letter-spacing: 1px; }
+.ring-center .task-name { font-size: 13px; color: #a09888; margin-top: 4px; }
+
+/* 子步骤气泡 */
+.sub-bubbles { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+.sub-bubble {
+  padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;
+  background: #2a2d38; color: #a09888; border: 1px solid #3a3d48;
+  transition: .15s;
+}
+.sub-bubble.done { background: #2a3a30; color: #6aaa7a; border-color: #3a5a40; text-decoration: line-through; }
+.sub-bubble.current { border-color: #d4a854; color: #d4a854; }
+
+/* 按钮行 */
+.btn-row { display: flex; gap: 10px; justify-content: center; }
+.btn-circle {
+  width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+  font-size: 18px; display: flex; align-items: center; justify-content: center;
+  transition: .15s;
+}
+.btn-circle.play { background: #c44a4a; color: #fff; }
+.btn-circle.pause { background: #4a5a6a; color: #fff; }
+.btn-circle.done { background: #3a5a4a; color: #fff; }
+.btn-circle.stop { background: transparent; border: 1.5px solid #5a5850; color: #8a8070; }
+.btn-label { font-size: 10px; color: #7a7060; text-align: center; margin-top: 3px; }
+
+.btn-group { text-align: center; }
+.btn-group .btn-circle { margin: 0 4px; }
+
+/* ====== 休息态 ====== */
+.rest-active .ring-fg { stroke: #6a9aac; }
+.rest-active .ring-center .time-big { font-size: 32px; }
+.rest-active .ring-center .rest-label { font-size: 13px; color: #6a9aac; }
+
+/* ====== 完成弹窗 ====== */
+.complete-popup {
+  background: #252830; border-radius: 20px; padding: 28px 20px; text-align: center;
+  max-width: 300px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,.3);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+.complete-popup .big-emoji { font-size: 48px; margin-bottom: 10px; }
+.complete-popup .praise { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.complete-popup .sub-info { font-size: 12px; color: #8a8070; margin-bottom: 12px; }
+.complete-popup .time-input-row {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  margin-bottom: 16px; font-size: 14px; color: #a09888;
+}
+.complete-popup .time-input-row input {
+  width: 64px; background: #1e2028; border: 1px solid #3a3d48; color: #e0d8cc;
+  border-radius: 16px; padding: 12px 14px; text-align: center; font-size: 16px;
+}
+.complete-popup .notes-input {
+  width: 100%; background: #1e2028; border: 1px solid #3a3d48; color: #e0d8cc;
+  border-radius: 16px; padding: 14px 16px; font-size: 14px; margin-bottom: 16px;
+  resize: none; height: 56px;
+}
+.complete-popup .actions { display: flex; gap: 8px; justify-content: center; }
+.complete-popup .actions button {
+  border: none; border-radius: 20px; padding: 10px 24px; font-size: 13px; cursor: pointer;
+}
+.btn-confirm { background: #d4a854; color: #1e2130; font-weight: 600; border-radius: 12px; }
+.btn-skip { background: transparent; color: #8a8070; }
+
+/* ====== 停止分流弹窗 ====== */
+.split-popup {
+  background: #252830; border-radius: 20px; padding: 24px 20px; text-align: center;
+  max-width: 320px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,.3);
+}
+.split-popup h3 { font-size: 16px; margin-bottom: 14px; color: #e0d8cc; }
+.split-row { margin-bottom: 10px; text-align: left; }
+.split-row label { font-size: 11px; color: #8a8070; display: block; margin-bottom: 4px; }
+.split-row input {
+  width: 100%; background: #1e2028; border: 1px solid #3a3d48; color: #e0d8cc;
+  border-radius: 16px; padding: 14px 16px; font-size: 14px;
+}
+.split-hint { font-size: 12px; color: #8a8070; margin: 10px 0 14px; text-align: left; }
+.split-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+@keyframes popIn { from{transform:scale(.7);opacity:0} to{transform:scale(1);opacity:1} }
+
+/* 显示控制 */
+.state-panel { display: none; }
+.state-panel.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- 状态切换 -->
+<div class="state-label">
+  <span class="state-btn active" onclick="showState('idle')">空闲态</span>
+  <span class="state-btn" onclick="showState('active')">计时中</span>
+  <span class="state-btn" onclick="showState('rest')">休息中</span>
+  <span class="state-btn" onclick="showState('done')">完成</span>
+  <span class="state-btn" onclick="showState('split')">停止分流</span>
+</div>
+
+<!-- ====== ① 空闲态 ====== -->
+<div class="state-panel show" id="panel-idle">
+
+  <!-- 自由模式入口 -->
+  <div class="idle-header">
+    <button class="free-btn">🧘 自由凝神</button>
+  </div>
+
+  <!-- 今日待凝神 -->
+  <div class="task-waiting">
+    <h3>待凝神</h3>
+    <div class="wait-item">
+      <div class="play-dot">▶</div>
+      <div class="info">
+        <div class="name">写月度报告</div>
+        <div class="meta">3 个子任务 · 已凝神 2 轮</div>
+      </div>
+      <div class="est">60 min</div>
+    </div>
+    <div class="wait-item">
+      <div class="play-dot">▶</div>
+      <div class="info">
+        <div class="name">整理邮件</div>
+        <div class="meta">未开始</div>
+      </div>
+      <div class="est">30 min</div>
+    </div>
+    <div class="wait-item" style="opacity:.5;">
+      <div class="play-dot" style="background:#3a5a4a;">✓</div>
+      <div class="info">
+        <div class="name">整理大纲</div>
+        <div class="meta">已完成</div>
+      </div>
+      <div class="est" style="color:#6aaa7a;">20 min</div>
+    </div>
+  </div>
+
+  <!-- 统计 -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:13px;font-weight:600;">📊</span>
+      <span style="font-size:11px;color:#7a7060;">近 7 天累计 4.8h</span>
+    </div>
+    <div class="stats-tabs">
+      <span class="stats-tab on">热力图</span>
+      <span class="stats-tab">趋势</span>
+      <span class="stats-tab">时段</span>
+    </div>
+    <!-- 热力图示意 -->
+    <div class="heatmap">
+      <div class="heat-col">
+        <div class="heat-label">一</div>
+        <div class="heat-cell l2"></div><div class="heat-cell l4"></div><div class="heat-cell l1"></div><div class="heat-cell l0"></div>
+      </div>
+      <div class="heat-col">
+        <div class="heat-label">二</div>
+        <div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l4"></div><div class="heat-cell l1"></div>
+      </div>
+      <div class="heat-col">
+        <div class="heat-label">三</div>
+        <div class="heat-cell l1"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div>
+      </div>
+      <div class="heat-col">
+        <div class="heat-label">四</div>
+        <div class="heat-cell l0"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div>
+      </div>
+      <div class="heat-col">
+        <div class="heat-label">五</div>
+        <div class="heat-cell l4"></div><div class="heat-cell l2"></div><div class="heat-cell l0"></div><div class="heat-cell l3"></div>
+      </div>
+      <div class="heat-col">
+        <div class="heat-label">六</div>
+        <div class="heat-cell l1"></div><div class="heat-cell l0"></div><div class="heat-cell l0"></div><div class="heat-cell l0"></div>
+      </div>
+      <div class="heat-col">
+        <div class="heat-label">日</div>
+        <div class="heat-cell l0"></div><div class="heat-cell l1"></div><div class="heat-cell l0"></div><div class="heat-cell l0"></div>
+      </div>
+    </div>
+    <div class="heat-legend">少 <span style="display:flex;gap:2px;"><span class="heat-cell l0"></span><span class="heat-cell l1"></span><span class="heat-cell l2"></span><span class="heat-cell l3"></span><span class="heat-cell l4"></span></span> 多</div>
+  </div>
+</div>
+
+<!-- ====== ② 计时中 ====== -->
+<div class="state-panel" id="panel-active">
+  <div class="card">
+    <div class="timer-active">
+      <div class="timer-ring-wrap">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle class="ring-bg" cx="90" cy="90" r="78"/>
+          <circle class="ring-fg normal" cx="90" cy="90" r="78"
+            stroke-dasharray="490" stroke-dashoffset="160"/>
+        </svg>
+        <div class="ring-center">
+          <div class="time-big">18:32</div>
+          <div class="task-name">写月度报告</div>
+        </div>
+      </div>
+
+      <!-- 子步骤气泡 -->
+      <div class="sub-bubbles">
+        <span class="sub-bubble done">整理大纲</span>
+        <span class="sub-bubble current">填写数据</span>
+        <span class="sub-bubble">校对</span>
+      </div>
+
+      <!-- 按钮 -->
+      <div class="btn-group">
+        <div style="display:flex;gap:12px;justify-content:center;">
+          <div>
+            <button class="btn-circle pause" style="margin:0 auto;">⏸</button>
+            <div class="btn-label">休息</div>
+          </div>
+          <div>
+            <button class="btn-circle done" style="margin:0 auto;">✓</button>
+            <div class="btn-label">完成</div>
+          </div>
+          <div>
+            <button class="btn-circle stop" style="margin:0 auto;">⏹</button>
+            <div class="btn-label">停止</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ③ 休息中 ====== -->
+<div class="state-panel" id="panel-rest">
+  <div class="card">
+    <div class="timer-active rest-active">
+      <div class="timer-ring-wrap">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle class="ring-bg" cx="90" cy="90" r="78"/>
+          <circle class="ring-fg" cx="90" cy="90" r="78"
+            stroke-dasharray="490" stroke-dashoffset="160"/>
+        </svg>
+        <div class="ring-center">
+          <div class="time-big">3:22</div>
+          <div class="rest-label">🌿 休息中</div>
+        </div>
+      </div>
+
+      <button class="free-btn" style="border-color:#6a9aac;color:#6a9aac;">回来了</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ④ 完成 ====== -->
+<div class="state-panel" id="panel-done">
+  <div class="complete-popup">
+    <div class="big-emoji">🎉</div>
+    <div class="praise">太棒啦！又完成一项！</div>
+    <div class="sub-info">写月度报告</div>
+    <div class="time-input-row">
+      <input value="28" type="number"> 分钟
+    </div>
+    <textarea class="notes-input" placeholder="备注"></textarea>
+    <div class="actions">
+      <button class="btn-skip">跳过</button>
+      <button class="btn-confirm">确认 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ⑤ 停止分流 ====== -->
+<div class="state-panel" id="panel-split">
+  <div class="split-popup">
+    <h3>💭 刚才的进度如何？</h3>
+    <div class="split-row">
+      <label>已完成</label>
+      <input placeholder="比如：整理了前3章数据" value="整理了前3章数据">
+    </div>
+    <div class="split-row">
+      <label>还完成了</label>
+      <input placeholder="写完了开头两段">
+    </div>
+    <div class="split-row">
+      <label>还没做</label>
+      <input placeholder="比如：画图表">
+    </div>
+    <div class="split-hint">💡 填写数据好像可以拆成更小的步骤</div>
+    <div class="btn-group">
+      <div style="display:flex;gap:20px;justify-content:center;">
+        <div>
+          <button class="btn-circle stop">⏹</button>
+          <div class="btn-label">结束</div>
+        </div>
+        <div>
+          <button class="btn-circle play">▶</button>
+          <div class="btn-label">继续</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showState(s) {
+  document.querySelectorAll('.state-panel').forEach(p => p.classList.remove('show'));
+  document.getElementById('panel-'+s).classList.add('show');
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

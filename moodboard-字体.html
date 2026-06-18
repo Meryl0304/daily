@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>字体对比 · 日常管理</title>
+
+<!-- 思源黑体 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<!-- 霞鹜文楷 -->
+<link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" rel="stylesheet">
+<!-- ZCOOL KuaiLe -->
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: -apple-system, sans-serif; background:#f5f4f0; padding:20px; }
+h1 { text-align:center; font-size:18px; color:#3a3226; margin-bottom:6px; }
+.sub { text-align:center; font-size:12px; color:#999; margin-bottom:24px; }
+
+.card { background:#fff; border-radius:16px; padding:24px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.card h2 { font-size:13px; color:#999; margin-bottom:14px; border-bottom:1px solid #eee; padding-bottom:8px; }
+
+/* 场景区块 */
+.scene { margin-bottom:18px; }
+.scene-label { font-size:10px; color:#bbb; margin-bottom:4px; letter-spacing:1px; }
+.preview-box { border-radius:12px; padding:16px; background:#fafaf8; }
+
+/* 字体 A: 思源黑体 */
+.font-a .preview-box { font-family: 'Noto Sans SC', sans-serif; }
+
+/* 字体 B: 霞鹜文楷 */
+.font-b .preview-box { font-family: 'LXGW WenKai', serif; }
+
+/* 字体 C: ZCOOL KuaiLe */
+.font-c .preview-box { font-family: 'ZCOOL KuaiLe', cursive; }
+
+/* ---- 模拟UI片段 ---- */
+
+/* 页眉 */
+.mock-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.mock-header .title { font-size:16px; font-weight:600; }
+.mock-header .pts { font-size:11px; background:#f0c040; color:#fff; border-radius:10px; padding:2px 8px; font-weight:600; }
+
+/* 极简模块 */
+.mock-date { font-size:18px; font-weight:600; margin-bottom:2px; }
+.mock-lunar { font-size:13px; color:#b0a090; margin-bottom:8px; }
+.mock-star { font-size:14px; padding:8px 12px; border-radius:10px; margin-bottom:8px; }
+.mock-star.undone { background: rgba(200,50,50,.08); color:#c0392b; }
+.mock-star.done { background: rgba(39,174,96,.08); color:#27ae60; }
+.mock-habit { font-size:12px; color:#8a8070; margin-bottom:4px; }
+.mock-habit span { margin-right:8px; }
+
+/* 标题层级 */
+.mock-section-title { font-size:14px; font-weight:600; margin:10px 0 6px; }
+.mock-task { font-size:13px; padding:6px 8px; border-radius:8px; margin-bottom:3px; }
+.mock-task.pending { color:#b0a090; }
+
+/* 小卖部 */
+.mock-shop-card { padding:12px; border-radius:12px; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
+.mock-shop-card .icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.mock-shop-card .name { font-size:14px; font-weight:600; }
+.mock-shop-card .meta { font-size:11px; color:#999; }
+.mock-shop-card .cost { font-weight:700; color:#e0a820; font-size:13px; }
+.mock-section-cat { font-size:14px; font-weight:700; color:#666; margin:12px 0 6px; }
+
+/* 凝神 */
+.mock-timer { text-align:center; }
+.mock-timer .time { font-size:34px; font-weight:700; }
+.mock-timer .task { font-size:13px; color:#888; margin-top:2px; }
+.mock-btn { display:inline-block; padding:6px 16px; border-radius:20px; font-size:12px; font-weight:500; }
+
+/* 标签 */
+.tags { margin-top:12px; display:flex; gap:6px; flex-wrap:wrap; }
+.tag { font-size:10px; padding:3px 8px; border-radius:10px; background:#e8e8e0; color:#888; }
+.tag.good { background:#e0f0e0; color:#5a8a5a; }
+.tag.bad  { background:#f0e0e0; color:#a06060; }
+
+/* 比较行 */
+.compare-row { display:flex; gap:12px; }
+.compare-col { flex:1; min-width:0; }
+</style>
+</head>
+<body>
+
+<h1>日常管理 · 字体选择</h1>
+<p class="sub">同一组 UI 片段，三种字体呈现</p>
+
+<!-- ======== 字体 A: 思源黑体 ======== -->
+<div class="card font-a">
+  <h2>字体 A · 思源黑体 Noto Sans SC</h2>
+  <p style="font-size:12px;color:#999;margin-bottom:14px;">无衬线 · 现代干净 · 可读性最强 · 免费开源（Google/Adobe）</p>
+
+  <div class="compare-row">
+    <div class="compare-col">
+      <div class="scene"><div class="scene-label">首页 · 极简模块</div>
+      <div class="preview-box">
+        <div class="mock-date">6月18日 星期三</div>
+        <div class="mock-lunar">农历五月廿三 · 宜出行 忌动土</div>
+        <div class="mock-star undone">★ 写月度报告 · 未完成</div>
+        <div class="mock-habit"><span>🔸 早起 67%</span><span>🔸 阅读 40%</span></div>
+      </div></div>
+
+      <div class="scene" style="margin-top:12px;"><div class="scene-label">日详情 · 今日事项</div>
+      <div class="preview-box">
+        <div class="mock-section-title">今日事项</div>
+        <div class="mock-task">★ 写月度报告 预计60min <span style="color:#27ae60;">✓ 完成啦</span></div>
+        <div class="mock-task pending" style="padding-left:24px;">— 整理大纲 <span style="color:#27ae60;">✓</span></div>
+        <div class="mock-task pending" style="padding-left:24px;">— 填写数据 · 进行中</div>
+        <div class="mock-task">📋 整理邮件 30min</div>
+      </div></div>
+    </div>
+
+    <div class="compare-col">
+      <div class="scene"><div class="scene-label">小卖部</div>
+      <div class="preview-box">
+        <div class="mock-header"><span class="title">🏪 小卖部</span><span class="pts">3,240</span></div>
+        <div class="mock-section-cat">🍬 零食柜</div>
+        <div class="preview-box" style="border:1px solid #e8e8e0;background:#fff;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="mock-shop-card .icon" style="width:40px;height:40px;border-radius:10px;background:#fef3e0;display:flex;align-items:center;justify-content:center;font-size:20px;">🧋</div>
+            <div><div class="name" style="font-size:14px;font-weight:600;">周末奶茶</div><div class="meta" style="font-size:11px;color:#999;">每周2次</div></div>
+            <div style="font-weight:700;color:#e0a820;">150</div>
+          </div>
+        </div>
+        <div class="mock-section-cat">🌟 心愿柜</div>
+        <div class="preview-box" style="border:1px solid #e8e8e0;background:#fff;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#f0e8f8;display:flex;align-items:center;justify-content:center;font-size:20px;">📚</div>
+            <div><div style="font-size:14px;font-weight:600;">一套新书</div><div style="font-size:11px;color:#999;">每月1次</div></div>
+            <div style="font-weight:700;color:#e0a820;">10,000</div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="scene" style="margin-top:12px;"><div class="scene-label">凝神 · 计时器</div>
+      <div class="preview-box">
+        <div class="mock-timer">
+          <div class="time">18:32</div>
+          <div class="task">写月度报告</div>
+          <div style="margin-top:8px;">
+            <span class="mock-btn" style="background:#7a9a7a;color:#fff;">▶ 开始</span>
+            <span class="mock-btn" style="border:1px solid #ccc;">⏹</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="tags">
+    <span class="tag good">适合正文长阅读</span>
+    <span class="tag good">数字/英文清晰</span>
+    <span class="tag">偏正式</span>
+    <span class="tag">缺乏温度</span>
+  </div>
+</div>
+
+<!-- ======== 字体 B: 霞鹜文楷 ======== -->
+<div class="card font-b">
+  <h2>字体 B · 霞鹜文楷 LXGW WenKai</h2>
+  <p style="font-size:12px;color:#999;margin-bottom:14px;">楷体变体 · 温润圆融 · 有手写温度 · 免费开源（OFL）</p>
+
+  <div class="compare-row">
+    <div class="compare-col">
+      <div class="scene"><div class="scene-label">首页 · 极简模块</div>
+      <div class="preview-box">
+        <div class="mock-date">6月18日 星期三</div>
+        <div class="mock-lunar">农历五月廿三 · 宜出行 忌动土</div>
+        <div class="mock-star undone">★ 写月度报告 · 未完成</div>
+        <div class="mock-habit"><span>🔸 早起 67%</span><span>🔸 阅读 40%</span></div>
+      </div></div>
+
+      <div class="scene" style="margin-top:12px;"><div class="scene-label">日详情 · 今日事项</div>
+      <div class="preview-box">
+        <div class="mock-section-title">今日事项</div>
+        <div class="mock-task">★ 写月度报告 预计60min <span style="color:#27ae60;">✓ 完成啦</span></div>
+        <div class="mock-task pending" style="padding-left:24px;">— 整理大纲 <span style="color:#27ae60;">✓</span></div>
+        <div class="mock-task pending" style="padding-left:24px;">— 填写数据 · 进行中</div>
+        <div class="mock-task">📋 整理邮件 30min</div>
+      </div></div>
+    </div>
+
+    <div class="compare-col">
+      <div class="scene"><div class="scene-label">小卖部</div>
+      <div class="preview-box">
+        <div class="mock-header"><span class="title">🏪 小卖部</span><span class="pts">3,240</span></div>
+        <div class="mock-section-cat">🍬 零食柜</div>
+        <div class="preview-box" style="border:1px solid #e8e8e0;background:#fff;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#fef3e0;display:flex;align-items:center;justify-content:center;font-size:20px;">🧋</div>
+            <div><div style="font-size:14px;font-weight:600;">周末奶茶</div><div style="font-size:11px;color:#999;">每周2次</div></div>
+            <div style="font-weight:700;color:#e0a820;">150</div>
+          </div>
+        </div>
+        <div class="mock-section-cat">🌟 心愿柜</div>
+        <div class="preview-box" style="border:1px solid #e8e8e0;background:#fff;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#f0e8f8;display:flex;align-items:center;justify-content:center;font-size:20px;">📚</div>
+            <div><div style="font-size:14px;font-weight:600;">一套新书</div><div style="font-size:11px;color:#999;">每月1次</div></div>
+            <div style="font-weight:700;color:#e0a820;">10,000</div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="scene" style="margin-top:12px;"><div class="scene-label">凝神 · 计时器</div>
+      <div class="preview-box">
+        <div class="mock-timer">
+          <div class="time">18:32</div>
+          <div class="task">写月度报告</div>
+          <div style="margin-top:8px;">
+            <span class="mock-btn" style="background:#7a9a7a;color:#fff;">▶ 开始</span>
+            <span class="mock-btn" style="border:1px solid #ccc;">⏹</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="tags">
+    <span class="tag good">温润有温度</span>
+    <span class="tag good">和凝神/小卖部气质吻合</span>
+    <span class="tag good">阅读舒适</span>
+    <span class="tag">英数略弱</span>
+  </div>
+</div>
+
+<!-- ======== 字体 C: ZCOOL KuaiLe ======== -->
+<div class="card font-c">
+  <h2>字体 C · ZCOOL KuaiLe</h2>
+  <p style="font-size:12px;color:#999;margin-bottom:14px;">圆体美术字 · 活泼俏皮 · 有童趣 · 免费开源（Google）</p>
+
+  <div class="compare-row">
+    <div class="compare-col">
+      <div class="scene"><div class="scene-label">首页 · 极简模块</div>
+      <div class="preview-box">
+        <div class="mock-date">6月18日 星期三</div>
+        <div class="mock-lunar">农历五月廿三 · 宜出行 忌动土</div>
+        <div class="mock-star undone">★ 写月度报告 · 未完成</div>
+        <div class="mock-habit"><span>🔸 早起 67%</span><span>🔸 阅读 40%</span></div>
+      </div></div>
+
+      <div class="scene" style="margin-top:12px;"><div class="scene-label">日详情 · 今日事项</div>
+      <div class="preview-box">
+        <div class="mock-section-title">今日事项</div>
+        <div class="mock-task">★ 写月度报告 预计60min <span style="color:#27ae60;">✓ 完成啦</span></div>
+        <div class="mock-task pending" style="padding-left:24px;">— 整理大纲 <span style="color:#27ae60;">✓</span></div>
+        <div class="mock-task pending" style="padding-left:24px;">— 填写数据 · 进行中</div>
+        <div class="mock-task">📋 整理邮件 30min</div>
+      </div></div>
+    </div>
+
+    <div class="compare-col">
+      <div class="scene"><div class="scene-label">小卖部</div>
+      <div class="preview-box">
+        <div class="mock-header"><span class="title">🏪 小卖部</span><span class="pts">3,240</span></div>
+        <div class="mock-section-cat">🍬 零食柜</div>
+        <div class="preview-box" style="border:1px solid #e8e8e0;background:#fff;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#fef3e0;display:flex;align-items:center;justify-content:center;font-size:20px;">🧋</div>
+            <div><div style="font-size:14px;font-weight:600;">周末奶茶</div><div style="font-size:11px;color:#999;">每周2次</div></div>
+            <div style="font-weight:700;color:#e0a820;">150</div>
+          </div>
+        </div>
+        <div class="mock-section-cat">🌟 心愿柜</div>
+        <div class="preview-box" style="border:1px solid #e8e8e0;background:#fff;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#f0e8f8;display:flex;align-items:center;justify-content:center;font-size:20px;">📚</div>
+            <div><div style="font-size:14px;font-weight:600;">一套新书</div><div style="font-size:11px;color:#999;">每月1次</div></div>
+            <div style="font-weight:700;color:#e0a820;">10,000</div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="scene" style="margin-top:12px;"><div class="scene-label">凝神 · 计时器</div>
+      <div class="preview-box">
+        <div class="mock-timer">
+          <div class="time">18:32</div>
+          <div class="task">写月度报告</div>
+          <div style="margin-top:8px;">
+            <span class="mock-btn" style="background:#7a9a7a;color:#fff;">▶ 开始</span>
+            <span class="mock-btn" style="border:1px solid #ccc;">⏹</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="tags">
+    <span class="tag good">活泼不沉闷</span>
+    <span class="tag good">小卖部很搭</span>
+    <span class="tag bad">正文阅读疲劳</span>
+    <span class="tag bad">正式场景违和</span>
+  </div>
+</div>
+
+<p style="text-align:center;font-size:12px;color:#bbb;margin-top:20px;">
+三种字体均免费可商用 · 加载可能需要几秒
+</p>
+
+</body>
+</html>

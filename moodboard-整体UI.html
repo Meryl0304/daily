@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小满 · 四种整体UI风格</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: -apple-system, "Segoe UI", sans-serif; background:#111; padding:16px; }
+h2 { text-align:center; font-size:13px; color:#666; margin:24px 0 10px; }
+.wrap { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+.card { width:350px; min-height:500px; border-radius:20px; padding:20px 16px; position:relative; overflow:hidden; }
+.card h3 { font-size:12px; margin-bottom:10px; text-align:center; }
+.label { position:absolute; top:10px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.7); color:#fff; padding:3px 12px; border-radius:10px; font-size:10px; z-index:5; }
+.header { display:flex; justify-content:space-between; align-items:center; padding:6px 12px; border-radius:12px; margin-bottom:10px; font-size:15px; font-weight:700; }
+.focus-block { border-radius:14px; padding:14px; margin-bottom:10px; }
+.focus-block .date { font-size:16px; font-weight:700; margin-bottom:2px; }
+.focus-block .lunar { font-size:11px; opacity:.6; margin-bottom:6px; }
+.focus-block .star { padding:8px 12px; border-radius:10px; font-size:13px; margin-bottom:4px; }
+.focus-block .habits { font-size:11px; opacity:.5; margin-bottom:4px; display:flex; gap:8px; }
+.focus-block .water { font-size:12px; margin-top:4px; }
+.cal-card { border-radius:14px; padding:14px; margin-bottom:10px; }
+.cal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:14px; font-weight:600; }
+.cal-grid { display:flex; gap:2px; }
+.cal-col { display:flex; flex-direction:column; gap:2px; flex:1; text-align:center; }
+.cal-day { font-size:9px; opacity:.4; }
+.cal-num { font-size:11px; padding:3px 0; border-radius:6px; }
+.cal-num.today { font-weight:700; }
+.events-card { border-radius:14px; padding:14px; }
+.events-card h4 { font-size:12px; margin-bottom:6px; }
+.event-row { display:flex; align-items:center; gap:6px; font-size:12px; padding:3px 0; }
+.nav { display:flex; justify-content:space-around; padding:10px 0; margin-top:8px; border-radius:12px; font-size:10px; }
+.nav span { opacity:.5; }
+
+/* ====== ① 软萌小鸭 Plan Joy ====== */
+.duck {
+  background: linear-gradient(180deg, #fef9f0 0%, #fef5e8 50%, #fdf0dc 100%);
+  color:#4a3530;
+  font-family: -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+.duck .header { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.duck .header .title { color:#e08050; display:flex; align-items:center; gap:4px; }
+.duck .header .title::before { content:'🦆'; font-size:20px; }
+.duck .focus-block { background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.04); border:1px solid #f0e0d0; }
+.duck .focus-block .date { color:#c07040; }
+.duck .focus-block .star { background:rgba(240,128,80,.08); color:#d06030; font-weight:600; }
+.duck .cal-card { background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+.duck .cal-num { background:#fef5ec; }
+.duck .cal-num.today { background:linear-gradient(135deg,#f0a060,#e88850); color:#fff; }
+.duck .events-card { background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+.duck .events-card h4 { color:#e08050; }
+.duck .nav { background:#fff; box-shadow:0 -1px 4px rgba(0,0,0,.03); }
+.duck .nav .active { color:#e08050; opacity:1; font-weight:600; }
+.duck .water-bar { height:8px; background:#f0e0d0; border-radius:4px; overflow:hidden; }
+.duck .water-fill { height:100%; background:linear-gradient(90deg,#f0a060,#e88850); width:60%; border-radius:4px; }
+
+/* ====== ② 活力色块 Tiimo ====== */
+.tiimo {
+  background:#fafaf8; color:#2a2a2a;
+  font-family: -apple-system,"Segoe UI","Inter",sans-serif;
+}
+.tiimo .header { background:#2a2a2a; color:#fff; }
+.tiimo .header .title { font-weight:700; letter-spacing:-.5px; display:flex; align-items:center; gap:4px; }
+.tiimo .header .title::before { content:'⚡'; font-size:18px; }
+.tiimo .focus-block { background:#fff; border-left:4px solid #ff6b6b; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.tiimo .focus-block .date { color:#2a2a2a; }
+.tiimo .focus-block .star { background:#fff5f5; color:#ff6b6b; font-weight:600; border-left:3px solid #ff6b6b; }
+.tiimo .cal-card { background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.tiimo .cal-num.today { background:#2a2a2a; color:#fff; border-radius:50%; }
+.tiimo .events-card { background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.tiimo .events-card h4 { color:#2a2a2a; font-weight:700; display:flex; align-items:center; gap:4px; }
+.tiimo .events-card h4::before { content:''; width:8px; height:8px; background:#ff6b6b; border-radius:2px; }
+.tiimo .nav { background:#2a2a2a; color:#fff; }
+.tiimo .nav .active { color:#ff6b6b; opacity:1; font-weight:700; }
+.tiimo .water-bar { height:6px; background:#eee; border-radius:3px; }
+.tiimo .water-fill { height:100%; background:#ff6b6b; width:60%; border-radius:3px; }
+
+/* ====== ③ 诗意樱花 ====== */
+.sakura {
+  background: linear-gradient(180deg, #fff5f7 0%, #fff0f4 50%, #ffebf0 100%);
+  color:#5a3a4a;
+  font-family: "PingFang SC","Microsoft YaHei",serif;
+}
+.sakura .header { background:rgba(255,255,255,.8); backdrop-filter:blur(10px); border-bottom:1px solid #fddde5; }
+.sakura .header .title { color:#c87080; display:flex; align-items:center; gap:4px; font-weight:500; }
+.sakura .header .title::before { content:'🌸'; font-size:18px; }
+.sakura .header .title::after { content:'🌸'; font-size:14px; opacity:.5; }
+.sakura .focus-block { background:rgba(255,255,255,.6); border:1px solid #fddde5; backdrop-filter:blur(8px); }
+.sakura .focus-block .date { color:#a05060; }
+.sakura .focus-block .star { background:rgba(200,112,128,.06); color:#b05060; border-radius:12px; font-weight:500; }
+.sakura .focus-block .star::before { content:'🌸 '; }
+.sakura .cal-card { background:rgba(255,255,255,.6); border:1px solid #fddde5; }
+.sakura .cal-num.today { background:rgba(200,112,128,.12); color:#b05060; border-radius:50%; font-weight:700; }
+.sakura .events-card { background:rgba(255,255,255,.6); border:1px solid #fddde5; }
+.sakura .events-card h4 { color:#c87080; }
+.sakura .nav { background:rgba(255,255,255,.8); border-top:1px solid #fddde5; }
+.sakura .nav .active { color:#c87080; opacity:1; font-weight:600; }
+.sakura .water-bar { height:6px; background:#fddde5; border-radius:10px; }
+.sakura .water-fill { height:100%; background:linear-gradient(90deg,#e8a0b0,#d88090); width:60%; border-radius:10px; }
+
+/* ====== ④ 游戏机 Wii/NDS ====== */
+.console {
+  background: #e8e4e0; color:#3a3a38;
+  font-family: "Segoe UI","Inter",sans-serif;
+  border:3px solid #d0ccc8; box-shadow:inset 0 2px 8px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.1);
+}
+.console .header { background:linear-gradient(180deg,#c8c4c0,#b8b4b0); border-bottom:3px solid #a8a4a0; padding:8px 14px; font-weight:700; color:#5a5850; }
+.console .header .title { display:flex; align-items:center; gap:6px; }
+.console .header .title::before { content:''; width:12px; height:12px; background:#ff6b6b; border-radius:50%; box-shadow:12px 0 0 #ffd93d, 24px 0 0 #6bcb77; }
+.console .focus-block { background:#f8f4f0; border:2px solid #d8d4d0; border-radius:16px; box-shadow:inset 0 1px 4px rgba(255,255,255,.8), 0 3px 6px rgba(0,0,0,.06); }
+.console .focus-block .star { background:#fff; border:2px solid #ff6b6b; color:#d04040; border-radius:8px; padding:6px 10px; font-weight:700; text-transform:uppercase; font-size:11px; }
+.console .cal-card { background:#f8f4f0; border:2px solid #d8d4d0; border-radius:16px; }
+.console .cal-num { background:#e8e4e0; border-radius:6px; font-weight:700; }
+.console .cal-num.today { background:#fff; color:#ff6b6b; border:2px solid #ff6b6b; }
+.console .events-card { background:#f8f4f0; border:2px solid #d8d4d0; border-radius:16px; }
+.console .nav { background:linear-gradient(180deg,#c8c4c0,#b8b4b0); border-top:3px solid #a8a4a0; border-radius:12px; gap:0; }
+.console .nav span { color:#5a5850; font-weight:700; padding:8px 0; }
+.console .nav .active { color:#ff6b6b; }
+.console .water-bar { height:10px; background:#d8d4d0; border-radius:5px; border:1px solid #c8c4c0; }
+.console .water-fill { height:100%; background:linear-gradient(90deg,#6bcb77,#5ab868); width:60%; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<h2>🌸 小满 · 四种整体UI风格（日历首页）</h2>
+
+<div class="wrap">
+
+<!-- ① Plan Joy -->
+<div class="card duck">
+  <div class="label">① 软萌小鸭 · Plan Joy 风</div>
+  <div class="header"><span class="title">小满</span><span>🪙 320</span></div>
+  <div class="focus-block">
+    <div class="date">6月18日 星期四</div>
+    <div class="lunar">甲辰年 · 五月廿一</div>
+    <div class="star">★ 写月度报告 · 未完成</div>
+    <div class="habits"><span>🔸 早起 67%</span><span>🔸 阅读 40%</span></div>
+    <div class="water">💧 <span class="water-bar"><span class="water-fill"></span></span> 4/6</div>
+  </div>
+  <div class="cal-card">
+    <div class="cal-header"><span>←</span><span>2026年 6月</span><span>→</span> <span style="font-size:11px;">今天</span></div>
+    <div class="cal-grid">
+      <div class="cal-col"><span class="cal-day">一</span><span class="cal-num"></span><span class="cal-num">2</span><span class="cal-num">9</span><span class="cal-num">16</span><span class="cal-num">23</span></div>
+      <div class="cal-col"><span class="cal-day">二</span><span class="cal-num"></span><span class="cal-num">3</span><span class="cal-num">10</span><span class="cal-num">17</span><span class="cal-num">24</span></div>
+      <div class="cal-col"><span class="cal-day">三</span><span class="cal-num"></span><span class="cal-num">4</span><span class="cal-num">11</span><span class="cal-num today">18</span><span class="cal-num">25</span></div>
+      <div class="cal-col"><span class="cal-day">四</span><span class="cal-num"></span><span class="cal-num">5</span><span class="cal-num">12</span><span class="cal-num">19</span><span class="cal-num">26</span></div>
+      <div class="cal-col"><span class="cal-day">五</span><span class="cal-num">1</span><span class="cal-num">6</span><span class="cal-num">13</span><span class="cal-num">20</span><span class="cal-num">27</span></div>
+      <div class="cal-col"><span class="cal-day">六</span><span class="cal-num"></span><span class="cal-num">7</span><span class="cal-num">14</span><span class="cal-num">21</span><span class="cal-num">28</span></div>
+      <div class="cal-col"><span class="cal-day">日</span><span class="cal-num"></span><span class="cal-num">8</span><span class="cal-num">15</span><span class="cal-num">22</span><span class="cal-num">29</span></div>
+    </div>
+  </div>
+  <div class="events-card">
+    <h4>📅 事件</h4>
+    <div class="event-row"><span>09:00</span><span>团队周会</span><span style="color:#27ae60;margin-left:auto;">✓</span></div>
+    <div class="event-row"><span>14:30</span><span>牙医预约</span><span style="color:#e74c3c;margin-left:auto;">⚠</span></div>
+  </div>
+  <div class="nav"><span class="active">📅 日历</span><span>🎯 凝神</span><span>🏪 小卖部</span><span>🌸 花开</span><span>🌐 拾语</span><span>⚙</span></div>
+</div>
+
+<!-- ② Tiimo -->
+<div class="card tiimo">
+  <div class="label">② 活力色块 · Tiimo 风</div>
+  <div class="header"><span class="title">小满</span><span style="font-size:13px;">3,240</span></div>
+  <div class="focus-block">
+    <div class="date">6月18日 星期四</div>
+    <div class="lunar">甲辰年 · 五月廿一</div>
+    <div class="star">★ 写月度报告</div>
+    <div class="habits"><span>🔸 早起 67%</span><span>🔸 阅读 40%</span></div>
+    <div class="water">💧 <span class="water-bar"><span class="water-fill"></span></span> 4/6</div>
+  </div>
+  <div class="cal-card">
+    <div class="cal-header"><span>←</span><span>2026年 6月</span><span>→</span> <span style="font-size:11px;background:#2a2a2a;color:#fff;padding:2px 8px;border-radius:10px;">今天</span></div>
+    <div class="cal-grid">
+      <div class="cal-col"><span class="cal-day">一</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">9</span><span class="cal-num">16</span><span class="cal-num">23</span></div>
+      <div class="cal-col"><span class="cal-day">二</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">10</span><span class="cal-num">17</span><span class="cal-num">24</span></div>
+      <div class="cal-col"><span class="cal-day">三</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">11</span><span class="cal-num today">18</span><span class="cal-num">25</span></div>
+      <div class="cal-col"><span class="cal-day">四</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">12</span><span class="cal-num">19</span><span class="cal-num">26</span></div>
+      <div class="cal-col"><span class="cal-day">五</span><span class="cal-num"></span><span class="cal-num">1</span><span class="cal-num">13</span><span class="cal-num">20</span><span class="cal-num">27</span></div>
+      <div class="cal-col"><span class="cal-day">六</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">14</span><span class="cal-num">21</span><span class="cal-num">28</span></div>
+      <div class="cal-col"><span class="cal-day">日</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">15</span><span class="cal-num">22</span><span class="cal-num">29</span></div>
+    </div>
+  </div>
+  <div class="events-card">
+    <h4>事件</h4>
+    <div class="event-row"><span>09:00</span><span>团队周会</span><span style="color:#27ae60;margin-left:auto;">✓</span></div>
+    <div class="event-row"><span>14:30</span><span>牙医预约</span><span style="color:#ff6b6b;margin-left:auto;">⚠</span></div>
+  </div>
+  <div class="nav"><span class="active">📅</span><span>🎯</span><span>🏪</span><span>🌸</span><span>🌐</span><span>⚙</span></div>
+</div>
+
+<!-- ③ 诗意樱花 -->
+<div class="card sakura">
+  <div class="label">③ 诗意樱花 · 时光绘 风</div>
+  <div class="header"><span class="title">小满</span><span style="color:#c87080;">🪙 320</span></div>
+  <div class="focus-block">
+    <div class="date">6月18日 星期四</div>
+    <div class="lunar">甲辰年 · 虎 · 五月廿一</div>
+    <div class="star">写月度报告 · 未完成</div>
+    <div class="habits"><span>🌸 早起 67%</span><span>🌸 阅读 40%</span></div>
+    <div class="water">🌸 <span class="water-bar"><span class="water-fill"></span></span> 4/6</div>
+  </div>
+  <div class="cal-card">
+    <div class="cal-header"><span>←</span><span>2026年 6月</span><span>→</span> <span style="font-size:11px;color:#c87080;">今天</span></div>
+    <div class="cal-grid">
+      <div class="cal-col"><span class="cal-day">一</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">9</span><span class="cal-num">16</span><span class="cal-num">23</span></div>
+      <div class="cal-col"><span class="cal-day">二</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">10</span><span class="cal-num">17</span><span class="cal-num">24</span></div>
+      <div class="cal-col"><span class="cal-day">三</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">11</span><span class="cal-num today">18</span><span class="cal-num">25</span></div>
+      <div class="cal-col"><span class="cal-day">四</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">12</span><span class="cal-num">19</span><span class="cal-num">26</span></div>
+      <div class="cal-col"><span class="cal-day">五</span><span class="cal-num"></span><span class="cal-num">1</span><span class="cal-num">13</span><span class="cal-num">20</span><span class="cal-num">27</span></div>
+      <div class="cal-col"><span class="cal-day">六</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">14</span><span class="cal-num">21</span><span class="cal-num">28</span></div>
+      <div class="cal-col"><span class="cal-day">日</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">15</span><span class="cal-num">22</span><span class="cal-num">29</span></div>
+    </div>
+  </div>
+  <div class="events-card">
+    <h4>🌸 事件</h4>
+    <div class="event-row"><span>09:00</span><span>团队周会</span><span style="color:#8ab080;margin-left:auto;">✓</span></div>
+    <div class="event-row"><span>14:30</span><span>牙医预约</span><span style="color:#d08080;margin-left:auto;">⚠</span></div>
+  </div>
+  <div class="nav"><span class="active">📅</span><span>🎯</span><span>🏪</span><span>🌸</span><span>🌐</span><span>⚙</span></div>
+</div>
+
+<!-- ④ 游戏机 -->
+<div class="card console">
+  <div class="label">④ 游戏机 · Wii/NDS 风</div>
+  <div class="header"><span class="title">小満</span><span style="font-size:12px;background:#fff;padding:2px 10px;border-radius:10px;">⭐ 320</span></div>
+  <div class="focus-block">
+    <div class="date">6月18日 星期四</div>
+    <div class="lunar" style="font-size:10px;">甲辰年 · 五月廿一</div>
+    <div class="star">★ 写月度报告 · 未完</div>
+    <div style="font-size:11px;margin-top:4px;">🔸 早起 67% 🔸 阅读 40%</div>
+    <div class="water" style="margin-top:4px;">💧 <span class="water-bar"><span class="water-fill"></span></span> 4/6</div>
+  </div>
+  <div class="cal-card">
+    <div class="cal-header"><button style="font-size:14px;cursor:pointer;background:#d8d4d0;border:2px solid #c8c4c0;border-radius:6px;padding:2px 8px;font-weight:700;">◀</button><span>2026.06</span><button style="font-size:14px;cursor:pointer;background:#d8d4d0;border:2px solid #c8c4c0;border-radius:6px;padding:2px 8px;font-weight:700;">▶</button></div>
+    <div class="cal-grid">
+      <div class="cal-col"><span class="cal-day">一</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">9</span><span class="cal-num">16</span><span class="cal-num">23</span></div>
+      <div class="cal-col"><span class="cal-day">二</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">10</span><span class="cal-num">17</span><span class="cal-num">24</span></div>
+      <div class="cal-col"><span class="cal-day">三</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">11</span><span class="cal-num today">18</span><span class="cal-num">25</span></div>
+      <div class="cal-col"><span class="cal-day">四</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">12</span><span class="cal-num">19</span><span class="cal-num">26</span></div>
+      <div class="cal-col"><span class="cal-day">五</span><span class="cal-num"></span><span class="cal-num">1</span><span class="cal-num">13</span><span class="cal-num">20</span><span class="cal-num">27</span></div>
+      <div class="cal-col"><span class="cal-day">六</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">14</span><span class="cal-num">21</span><span class="cal-num">28</span></div>
+      <div class="cal-col"><span class="cal-day">日</span><span class="cal-num"></span><span class="cal-num"></span><span class="cal-num">15</span><span class="cal-num">22</span><span class="cal-num">29</span></div>
+    </div>
+  </div>
+  <div class="events-card">
+    <h4 style="color:#5a5850;font-weight:700;">📅 事件</h4>
+    <div class="event-row"><span>09:00</span><span>团队周会</span><span style="color:#5ab868;margin-left:auto;font-weight:700;">✓</span></div>
+    <div class="event-row"><span>14:30</span><span>牙医预约</span><span style="color:#d04040;margin-left:auto;font-weight:700;">⚠</span></div>
+  </div>
+  <div class="nav"><span class="active">📅</span><span>🎯</span><span>🏪</span><span>🌸</span><span>🌐</span><span>⚙</span></div>
+</div>
+
+</div>
+
+</body>
+</html>

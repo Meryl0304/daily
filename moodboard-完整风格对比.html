@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小满 · 完整风格对比</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#1a1a1a; padding:16px; color:#fff; }
+h2 { text-align:center; font-size:15px; margin:20px 0 10px; }
+.pages { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+.card { width:200px; min-height:280px; border-radius:16px; padding:12px; font-size:10px; }
+.card h4 { font-size:10px; margin-bottom:6px; text-align:center; opacity:.7; }
+
+/* ====== 共享元素 ====== */
+.pg-header { display:flex; justify-content:space-between; padding:4px 8px; border-radius:8px; margin-bottom:6px; font-size:10px; font-weight:600; }
+.pg-row { display:flex; align-items:center; gap:4px; padding:3px 6px; border-radius:6px; font-size:9px; margin-bottom:2px; }
+.pg-row .dot { width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; flex-shrink:0; }
+.pg-ring { width:60px; height:60px; border-radius:50%; border:4px solid; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; }
+.pg-btn { padding:3px 8px; border-radius:8px; font-size:8px; cursor:pointer; display:inline-block; }
+.pg-shop-card { display:flex; align-items:center; gap:4px; padding:5px 8px; border-radius:8px; margin-bottom:3px; font-size:9px; }
+.pg-shop-card .icon { width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+
+/* ====== ① 软萌小鸭 ====== */
+.duck-pg { background:linear-gradient(180deg,#fef9f0,#fef5e8); color:#4a3530; }
+.duck-pg .pg-header { background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.03); }
+.duck-pg .pg-header .t { color:#e08050; }
+.duck-pg .pg-row { background:#fff; }
+.duck-pg .pg-row .dot { background:#fef5ec; border:2px solid #f0d0b0; }
+.duck-pg .pg-row .dot.done { background:#f0a060; border-color:#e88850; color:#fff; }
+.duck-pg .pg-ring { border-color:#f0d0b0; color:#e08050; }
+.duck-pg .pg-btn { background:#f0a060; color:#fff; }
+.duck-pg .pg-btn.outline { background:transparent; border:1.5px solid #f0d0b0; color:#e08050; }
+.duck-pg .pg-shop-card { background:#fff; }
+.duck-pg .pg-shop-card .icon { background:#fef3e0; }
+.duck-pg .pg-bar { height:6px; background:#f0e0d0; border-radius:3px; }
+.duck-pg .pg-bar-fill { height:100%; background:linear-gradient(90deg,#f0a060,#e88850); border-radius:3px; }
+.duck-pg .pg-nav { display:flex; justify-content:space-between; padding:6px; background:#fff; border-radius:8px; margin-top:6px; font-size:8px; }
+.duck-pg .pg-nav .a { color:#e08050; font-weight:600; }
+
+/* ====== ③ 诗意樱花 ====== */
+.sakura-pg { background:linear-gradient(180deg,#fff5f7,#fff0f4,#ffebf0); color:#5a3a4a; font-family:"PingFang SC","Microsoft YaHei",serif; }
+.sakura-pg .pg-header { background:rgba(255,255,255,.6); border-bottom:1px solid #fddde5; }
+.sakura-pg .pg-header .t { color:#c87080; font-weight:500; }
+.sakura-pg .pg-row { background:rgba(255,255,255,.4); border:1px solid #fddde5; }
+.sakura-pg .pg-row .dot { background:rgba(200,112,128,.08); border:2px solid #e8b0c0; }
+.sakura-pg .pg-row .dot.done { background:#d890a0; border-color:#c87080; color:#fff; }
+.sakura-pg .pg-ring { border-color:#e8b0c0; color:#c87080; }
+.sakura-pg .pg-btn { background:#d890a0; color:#fff; border-radius:12px; }
+.sakura-pg .pg-btn.outline { background:transparent; border:1.5px solid #e8b0c0; color:#c87080; }
+.sakura-pg .pg-shop-card { background:rgba(255,255,255,.5); border:1px solid #fddde5; }
+.sakura-pg .pg-shop-card .icon { background:rgba(200,112,128,.08); }
+.sakura-pg .pg-bar { height:6px; background:#fddde5; border-radius:10px; }
+.sakura-pg .pg-bar-fill { height:100%; background:linear-gradient(90deg,#e8a0b0,#d88090); border-radius:10px; }
+.sakura-pg .pg-nav { display:flex; justify-content:space-between; padding:6px; background:rgba(255,255,255,.6); border-top:1px solid #fddde5; border-radius:8px; font-size:8px; }
+.sakura-pg .pg-nav .a { color:#c87080; }
+.sakura-pg .icon-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#e8b0c0; margin-right:2px; }
+
+/* night overrides */
+body.night .duck-pg { filter:brightness(.9) saturate(.8); }
+body.night .sakura-pg { filter:brightness(.9) saturate(.8); }
+</style>
+</head>
+<body>
+
+<h2>🌸 小满 · 完整多页风格预览（上方：① PlanJoy / 下方：③ Sakura）</h2>
+
+<!-- ====== ① PLAN JOY DUCK ====== -->
+<h2>① 软萌小鸭 Plan Joy</h2>
+<div class="pages">
+
+<!-- 日历 -->
+<div class="card duck-pg">
+  <h4>📅 日历首页</h4>
+  <div class="pg-header"><span class="t">🦆 小满</span><span style="background:#f0a060;color:#fff;padding:1px 6px;border-radius:6px;font-size:8px;">320</span></div>
+  <div style="background:#fff;border-radius:10px;padding:8px;margin-bottom:4px;">
+    <b>6月18日 周四</b><br><span style="font-size:8px;opacity:.5;">甲辰年·五月廿一</span>
+    <div style="background:#fff5f0;border-radius:8px;padding:5px;margin-top:4px;">★ 写月度报告</div>
+    <div style="margin-top:3px;">💧 <span class="pg-bar"><span class="pg-bar-fill" style="width:67%;"></span></span> 4/6</div>
+  </div>
+  <div class="pg-nav"><span class="a">📅</span><span>🎯</span><span>🏪</span><span>🌸</span><span>🌐</span><span>⚙</span></div>
+</div>
+
+<!-- 凝神 -->
+<div class="card duck-pg">
+  <h4>🎯 凝神</h4>
+  <div class="pg-header"><span class="t">🦆 小满</span></div>
+  <div style="text-align:center;margin:8px 0;">
+    <div class="pg-ring" style="margin-bottom:4px;">🧘</div>
+    <b>Let's 专注</b>
+  </div>
+  <div class="pg-row"><span class="dot">▶</span><span>写月度报告</span><span style="margin-left:auto;font-size:8px;">60min</span></div>
+  <div class="pg-row"><span class="dot">▶</span><span>整理邮件</span><span style="margin-left:auto;font-size:8px;">30min</span></div>
+  <div class="pg-row"><span class="dot done">✓</span><span style="opacity:.5;">整理大纲</span></div>
+  <div style="margin-top:6px;font-size:8px;opacity:.4;">📊 近7天 4.8h</div>
+</div>
+
+<!-- 小卖部 -->
+<div class="card duck-pg">
+  <h4>🏪 小卖部</h4>
+  <div class="pg-header"><span class="t">🦆 小卖部</span><span style="font-size:10px;">🪙 320</span></div>
+  <div class="pg-shop-card"><span class="icon">🧋</span><span>周末奶茶</span><span style="margin-left:auto;font-weight:700;color:#e08050;">150</span></div>
+  <div class="pg-shop-card"><span class="icon">📚</span><span>一套新书</span><span style="margin-left:auto;font-weight:700;color:#e08050;">10000</span></div>
+  <div style="margin-top:6px;text-align:center;"><span class="pg-btn">进货啦</span></div>
+</div>
+
+<!-- 花开 -->
+<div class="card duck-pg">
+  <h4>🌸 花开</h4>
+  <div style="text-align:center;padding:10px;">
+    <div style="font-size:28px;color:#e08050;">🌸</div>
+    <div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin:6px 0;">
+      <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+    </div>
+    <div style="font-size:9px;opacity:.5;">近30天 8 颗</div>
+    <div style="margin-top:6px;"><span class="pg-btn outline">存下此刻</span></div>
+  </div>
+</div>
+
+<!-- 拾语 -->
+<div class="card duck-pg">
+  <h4>🌐 拾语</h4>
+  <div style="display:flex;gap:3px;margin-bottom:6px;">
+    <span class="pg-btn" style="font-size:8px;">EN</span><span class="pg-btn outline" style="font-size:8px;">JP</span><span class="pg-btn outline" style="font-size:8px;">FR</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;">
+    <span style="background:#fef6f0;padding:4px 8px;border-radius:12px;font-size:8px;">Good to know!</span>
+    <span style="background:#fef6f0;padding:4px 8px;border-radius:12px;font-size:8px;">It slipped my mind</span>
+    <span style="background:#fef6f0;padding:4px 8px;border-radius:12px;font-size:8px;">Take your time</span>
+  </div>
+</div>
+
+</div>
+
+<!-- ====== ③ SAKURA ====== -->
+<h2>③ 诗意樱花 Sakura</h2>
+<div class="pages">
+
+<!-- 日历 -->
+<div class="card sakura-pg">
+  <h4>📅 日历首页</h4>
+  <div class="pg-header"><span class="t">🌸 小满</span><span style="font-size:9px;color:#c87080;">🪙 320</span></div>
+  <div style="background:rgba(255,255,255,.5);border:1px solid #fddde5;border-radius:10px;padding:8px;margin-bottom:4px;">
+    <b>6月18日 星期四</b><br><span style="font-size:8px;opacity:.5;">甲辰年 · 虎 · 五月廿一</span>
+    <div style="background:rgba(200,112,128,.06);border-radius:10px;padding:5px;margin-top:4px;">🌸 写月度报告</div>
+    <div style="margin-top:3px;">🌸 <span class="pg-bar"><span class="pg-bar-fill" style="width:67%;"></span></span> 4/6</div>
+  </div>
+  <div class="pg-nav"><span class="a">📅</span><span>🎯</span><span>🏪</span><span>🌸</span><span>🌐</span><span>⚙</span></div>
+</div>
+
+<!-- 凝神 -->
+<div class="card sakura-pg">
+  <h4>🎯 凝神</h4>
+  <div class="pg-header"><span class="t">🌸 小满</span></div>
+  <div style="text-align:center;margin:8px 0;">
+    <div class="pg-ring" style="margin-bottom:4px;">🌸</div>
+    <span style="color:#c87080;font-weight:500;">Let's 专注</span>
+  </div>
+  <div class="pg-row"><span class="dot">▶</span><span>写月度报告</span><span style="margin-left:auto;font-size:8px;">60min</span></div>
+  <div class="pg-row"><span class="dot">▶</span><span>整理邮件</span><span style="margin-left:auto;font-size:8px;">30min</span></div>
+  <div class="pg-row"><span class="dot done">✓</span><span style="opacity:.5;">整理大纲</span></div>
+  <div style="margin-top:6px;font-size:8px;opacity:.4;">🌸 近7天 4.8h</div>
+</div>
+
+<!-- 小卖部 -->
+<div class="card sakura-pg">
+  <h4>🏪 小卖部</h4>
+  <div class="pg-header"><span class="t">🌸 小卖部</span><span style="font-size:10px;color:#c87080;">🪙 320</span></div>
+  <div class="pg-shop-card"><span class="icon">🧋</span><span>周末奶茶</span><span style="margin-left:auto;font-weight:700;color:#c87080;">150</span></div>
+  <div class="pg-shop-card"><span class="icon">📚</span><span>一套新书</span><span style="margin-left:auto;font-weight:700;color:#c87080;">10000</span></div>
+  <div style="margin-top:6px;text-align:center;"><span class="pg-btn">进货啦</span></div>
+</div>
+
+<!-- 花开 -->
+<div class="card sakura-pg">
+  <h4>🌸 花开</h4>
+  <div style="text-align:center;padding:10px;">
+    <div style="font-size:28px;color:#c87080;">🌸</div>
+    <div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin:6px 0;">
+      <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+    </div>
+    <div style="font-size:9px;opacity:.5;">近30天 8 颗</div>
+    <div style="margin-top:6px;"><span class="pg-btn outline">存下此刻</span></div>
+  </div>
+</div>
+
+<!-- 拾语 -->
+<div class="card sakura-pg">
+  <h4>🌐 拾语</h4>
+  <div style="display:flex;gap:3px;margin-bottom:6px;">
+    <span class="pg-btn" style="font-size:8px;">EN</span><span class="pg-btn outline" style="font-size:8px;">JP</span><span class="pg-btn outline" style="font-size:8px;">FR</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;">
+    <span style="background:rgba(200,112,128,.06);border:1px solid #fddde5;padding:4px 8px;border-radius:12px;font-size:8px;">Good to know!</span>
+    <span style="background:rgba(200,112,128,.06);border:1px solid #fddde5;padding:4px 8px;border-radius:12px;font-size:8px;">It slipped my mind</span>
+    <span style="background:rgba(200,112,128,.06);border:1px solid #fddde5;padding:4px 8px;border-radius:12px;font-size:8px;">Take your time</span>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>

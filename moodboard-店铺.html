@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小卖部 · 重新设计</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f8f9fa; max-width:420px; margin:0 auto; min-height:100vh;
+  padding: 16px; padding-bottom: 80px;
+}
+
+/* 积分头顶 */
+.points-header {
+  background: linear-gradient(135deg, #2c3e50 0%, #3d566e 100%);
+  border-radius: 16px; padding: 20px; color:#fff; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 14px;
+}
+.points-coin {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, #f0c040, #e0a820);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(240,192,64,.3);
+}
+.points-num { font-size: 32px; font-weight: 700; }
+.points-label { font-size: 12px; opacity:.7; }
+
+/* 提示条 */
+.hint-bar {
+  background: #fff; border-radius: 12px; padding: 12px 14px;
+  margin-bottom: 14px; font-size: 13px; color: #5a5a5a;
+  border-left: 3px solid #e0a820; box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  display: flex; align-items: center; gap: 8px;
+}
+.hint-bar .emoji { font-size: 22px; }
+
+/* 分类标题 */
+.section-title {
+  font-size: 15px; letter-spacing: 0;
+  color: #666; margin: 20px 0 10px 4px; font-weight: 700;
+}
+
+/* 奖励卡片 */
+.reward-card {
+  background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06); cursor: pointer; transition: .2s;
+  display: flex; align-items: center; gap: 12px; position: relative;
+  overflow: hidden;
+}
+.reward-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); transform: translateY(-1px); }
+.reward-card.affordable { border-left: 3px solid #27ae60; }
+.reward-card.almost { border-left: 3px solid #e0a820; }
+.reward-card.locked { border-left: 3px solid #ddd; opacity:.7; }
+
+.reward-icon {
+  width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+}
+.reward-icon.small-reward { background: #fef3e0; }
+.reward-icon.big-reward { background: #f0e8f8; }
+.reward-icon.free { background: #e8f5e9; }
+
+.reward-body { flex:1; min-width: 0; }
+.reward-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; color: #2c3e50; }
+.reward-meta { font-size: 12px; color: #999; }
+.reward-cost { font-weight: 700; color: #e0a820; }
+
+/* 进度条 */
+.reward-progress { margin-top: 8px; }
+.progress-bar-bg { height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+.progress-bar-fg { height: 100%; border-radius: 3px; transition: width .5s; }
+.progress-bar-fg.done { background: #27ae60; }
+.progress-bar-fg.going { background: linear-gradient(90deg, #e0a820, #f0c040); }
+.progress-label { font-size: 11px; color: #999; margin-top: 3px; text-align: right; }
+
+/* 兑换按钮（卡片内联） */
+.redeem-btn {
+  background: #27ae60; color: #fff; border: none; border-radius: 20px;
+  padding: 6px 16px; font-size: 12px; font-weight: 600; cursor: pointer;
+  flex-shrink: 0;
+}
+.redeem-btn.disabled { background: #ccc; cursor: not-allowed; }
+
+/* 庆祝遮罩 */
+.celebrate-overlay {
+  position: fixed; top:0; left:0; right:0; bottom:0; z-index:200;
+  background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center;
+  animation: fadeIn .3s;
+}
+.celebrate-card {
+  background: #fff; border-radius: 20px; padding: 32px 24px; text-align: center;
+  max-width: 300px; animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+.celebrate-card .big-emoji { font-size: 56px; margin-bottom: 12px; }
+.celebrate-card h2 { font-size: 20px; color: #2c3e50; margin-bottom: 4px; }
+.celebrate-card p { font-size: 13px; color: #999; margin-bottom: 16px; }
+.celebrate-card button {
+  background: #2c3e50; color: #fff; border: none;
+  border-radius: 20px; padding: 10px 28px; font-size: 14px; cursor: pointer;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes popIn { from{transform:scale(.7);opacity:0} to{transform:scale(1);opacity:1} }
+
+/* 添加面板 */
+.add-card {
+  background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.add-card h3 { font-size: 14px; margin-bottom: 8px; color: #2c3e50; }
+.add-row { display: flex; gap: 6px; }
+.add-row input {
+  flex:1; border: 1px solid #e0e0e0; border-radius: 10px; padding: 10px 12px;
+  font-size: 14px; outline: none;
+}
+.add-row input:focus { border-color: #e0a820; }
+.add-row .btn {
+  background: #2c3e50; color: #fff; border: none; border-radius: 10px;
+  padding: 10px 16px; font-size: 13px; cursor: pointer;
+}
+
+/* 兑换记录（折叠） */
+.log-section { margin-top:16px; }
+.log-toggle {
+  background: none; border: none; color: #999; font-size: 12px;
+  cursor: pointer; padding: 4px 0;
+}
+.log-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  font-size: 13px; border-bottom: 1px solid #f0f0f0;
+}
+.log-item .date { color: #999; font-size: 11px; }
+.log-item .name { flex:1; }
+.log-item .cost { color: #e0a820; font-weight: 600; }
+
+/* 夜间模式预览切换 */
+.preview-toggle {
+  position: fixed; bottom: 20px; right: 20px; z-index:50;
+  background: #2c3e50; color: #fff; border: none;
+  border-radius: 50%; width: 44px; height: 44px; font-size: 20px;
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+body.night {
+  background: #1a1d23;
+}
+body.night .points-header { background: linear-gradient(135deg, #1a1d28 0%, #252830 100%); }
+body.night .hint-bar { background: #252830; color: #c0b8a8; border-left-color: #d4a854; }
+body.night .reward-card { background: #252830; color: #d0c8b8; }
+body.night .reward-name { color: #e0d8cc; }
+body.night .reward-meta { color: #8a8070; }
+body.night .add-card { background: #252830; }
+body.night .add-card h3 { color: #e0d8cc; }
+body.night .add-row input { background: #1e2028; border-color: #3a3d42; color: #d0c8b8; }
+body.night .progress-bar-bg { background: #3a3d42; }
+body.night .section-title { color: #7a7060; }
+body.night .log-item { border-bottom-color: #2e3038; }
+body.night .celebrate-card { background: #252830; }
+body.night .celebrate-card h2 { color: #e0d8cc; }
+</style>
+</head>
+<body>
+
+<h1 style="font-size:17px;color:#2c3e50;margin-bottom:4px;">🏪 小卖部</h1>
+<p style="font-size:12px;color:#999;margin-bottom:16px;">攒积分，犒劳自己</p>
+
+<!-- 积分头顶 -->
+<div class="points-header">
+  <div class="points-coin">🪙</div>
+  <div>
+    <div class="points-num">3,240</div>
+    <div class="points-label">可用积分</div>
+  </div>
+</div>
+
+<!-- 接近提示 -->
+<div class="hint-bar">
+  <span class="emoji">✨</span>
+  还差 <strong style="color:#e0a820;">160 分</strong> 就能换奶茶啦～再搬 3 天的砖 🧱
+</div>
+
+<!-- 分组：小确幸 -->
+<div class="section-title">🍬 零食柜</div>
+
+<div class="reward-card affordable">
+  <div class="reward-icon small-reward">🧋</div>
+  <div class="reward-body">
+    <div class="reward-name">周末奶茶</div>
+    <div class="reward-meta">每周 2 次</div>
+    <div class="reward-progress">
+      <div class="progress-bar-bg"><div class="progress-bar-fg done" style="width:100%"></div></div>
+      <div class="progress-label">✓ 已可兑换</div>
+    </div>
+  </div>
+  <button class="redeem-btn" onclick="showCelebrate('🧋','周末奶茶','期待已久的犒劳时刻')">兑换</button>
+</div>
+
+<div class="reward-card almost">
+  <div class="reward-icon small-reward">☕</div>
+  <div class="reward-body">
+    <div class="reward-name">拿铁本周 3 杯</div>
+    <div class="reward-meta">每周 3 次</div>
+    <div class="reward-progress">
+      <div class="progress-bar-bg"><div class="progress-bar-fg going" style="width:74%"></div></div>
+      <div class="progress-label">还差 80 分</div>
+    </div>
+  </div>
+  <button class="redeem-btn disabled">兑换</button>
+</div>
+
+<div class="reward-card locked">
+  <div class="reward-icon small-reward">🍰</div>
+  <div class="reward-body">
+    <div class="reward-name">一块芝士蛋糕</div>
+    <div class="reward-meta">每周 1 次</div>
+    <div class="reward-progress">
+      <div class="progress-bar-bg"><div class="progress-bar-fg going" style="width:42%"></div></div>
+      <div class="progress-label">还差 290 分</div>
+    </div>
+  </div>
+  <button class="redeem-btn disabled">兑换</button>
+</div>
+
+<!-- 分组：期待已久 -->
+<div class="section-title">🌟 心愿柜</div>
+
+<div class="reward-card">
+  <div class="reward-icon big-reward">📚</div>
+  <div class="reward-body">
+    <div class="reward-name">一套新书</div>
+    <div class="reward-meta">每月 1 次</div>
+    <div class="reward-progress">
+      <div class="progress-bar-bg"><div class="progress-bar-fg going" style="width:18%"></div></div>
+      <div class="progress-label">还差 8,200 分</div>
+    </div>
+  </div>
+  <button class="redeem-btn disabled">兑换</button>
+</div>
+
+<div class="reward-card">
+  <div class="reward-icon big-reward">💆</div>
+  <div class="reward-body">
+    <div class="reward-name">一次 SPA</div>
+    <div class="reward-meta">每季度 1 次</div>
+    <div class="reward-progress">
+      <div class="progress-bar-bg"><div class="progress-bar-fg going" style="width:8%"></div></div>
+      <div class="progress-label">还差 17,800 分</div>
+    </div>
+  </div>
+  <button class="redeem-btn disabled">兑换</button>
+</div>
+
+<!-- 添加 -->
+<div class="add-card" style="margin-top:16px;">
+  <h3>📦 进货啦</h3>
+  <div class="add-row">
+    <input placeholder="想怎么犒劳自己？" style="flex:2;">
+    <input placeholder="每周N次" style="flex:1;">
+    <button class="btn">+</button>
+  </div>
+  <p style="font-size:11px;color:#bbb;margin-top:4px;">设频率 → 自动建议积分价格</p>
+</div>
+
+<!-- 兑换记录 -->
+<div class="log-section">
+  <button class="log-toggle" onclick="toggleLog()">📋 兑换记录 ▾</button>
+  <div id="logList" style="display:none;margin-top:8px;">
+    <div class="log-item"><span class="date">06-17</span><span class="name">周末奶茶</span><span class="cost">-150</span></div>
+    <div class="log-item"><span class="date">06-10</span><span class="name">拿铁本周 3 杯</span><span class="cost">-300</span></div>
+    <div class="log-item"><span class="date">06-03</span><span class="name">周末奶茶</span><span class="cost">-150</span></div>
+  </div>
+</div>
+
+<!-- 庆祝弹窗（默认隐藏） -->
+<div id="celebrateLayer"></div>
+
+<!-- 日间/夜间切换 -->
+<button class="preview-toggle" onclick="toggleNight()">🌙</button>
+
+<script>
+function toggleNight() {
+  document.body.classList.toggle('night');
+  var btn = document.querySelector('.preview-toggle');
+  btn.textContent = document.body.classList.contains('night') ? '☀️' : '🌙';
+}
+
+function showCelebrate(emoji, name, subtitle) {
+  var layer = document.getElementById('celebrateLayer');
+  layer.innerHTML = '<div class="celebrate-overlay" onclick="this.parentElement.innerHTML=\'\'"><div class="celebrate-card"><div class="big-emoji">🎉</div><h2>已兑换！</h2><p>'+emoji+' '+name+'</p><p style="color:#27ae60;font-weight:600;">今天就去享受吧</p><button onclick="this.parentElement.parentElement.parentElement.innerHTML=\'\'">太棒了</button></div></div>';
+}
+
+function toggleLog() {
+  var el = document.getElementById('logList');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  var btn = document.querySelector('.log-toggle');
+  btn.textContent = el.style.display === 'none' ? '📋 兑换记录 ▾' : '📋 兑换记录 ▴';
+}
+</script>
+
+</body>
+</html>

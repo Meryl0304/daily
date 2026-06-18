@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>凝神 · 风格化设计</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: -apple-system, "Segoe UI", sans-serif; background:#111; padding:16px; }
+h2 { text-align:center; font-size:13px; color:#666; margin:20px 0 12px; }
+.wrap { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+.card { width:340px; min-height:420px; border-radius:24px; padding:24px 18px; }
+.label { position:absolute; top:12px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.7); color:#fff; padding:3px 12px; border-radius:10px; font-size:10px; z-index:5; }
+
+/* ====== A: 庭园生长 ====== */
+.garden {
+  background: linear-gradient(180deg, #1a2f1a 0%, #1e3520 40%, #162818 100%);
+  color: #c8d8c0; position:relative; overflow:hidden;
+}
+.garden::before {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:80px;
+  background: linear-gradient(0deg, #0f1f0e 0%, transparent 100%);
+}
+.garden::after {
+  content:'🌱 🌿 🌱  🌿 🌱 🌿  🌱 🌿 🌱';
+  position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+  font-size:16px; letter-spacing:4px; opacity:.3; white-space:nowrap;
+}
+.garden .header { text-align:center; margin-bottom:14px; position:relative; z-index:1; }
+.garden .btn-free { background:rgba(80,160,80,.15); border:1.5px solid rgba(100,180,100,.3); color:#80c880; border-radius:20px; padding:9px 22px; font-size:13px; cursor:pointer; }
+.garden .smart-badge { color:rgba(160,200,140,.5); }
+.garden .task-item { background:rgba(40,80,40,.3); border:1px solid rgba(60,120,60,.2); border-radius:12px; display:flex; align-items:center; gap:8px; padding:9px 12px; margin-bottom:5px; font-size:13px; position:relative; z-index:1; }
+.garden .task-item .play { width:30px;height:30px;border-radius:50%;background:rgba(100,180,100,.25);color:#90d090;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;flex-shrink:0; }
+.garden .task-item .play.done-play { background:rgba(140,200,100,.3); color:#a0e0a0; }
+.garden .task-item .name { flex:1; }
+.garden .task-item .meta { font-size:11px; color:rgba(160,200,140,.5); }
+.garden .section-title { font-size:10px; letter-spacing:2px; color:rgba(140,180,120,.5); margin-bottom:6px; position:relative; z-index:1; }
+.garden .stats { margin-top:12px; position:relative; z-index:1; }
+.garden .stats-tab { padding:4px 12px;border-radius:12px;font-size:11px;color:rgba(140,180,120,.5);border:1px solid rgba(60,120,60,.2);cursor:pointer;display:inline-block;margin-right:4px; }
+.garden .stats-tab.on { background:rgba(60,120,60,.3); color:#a0d8a0; border-color:rgba(100,160,100,.4); }
+/* 计时态 */
+.garden-timer { background: linear-gradient(180deg, #1a2f1a, #1e3520); color:#c8d8c0; text-align:center; position:relative; }
+.garden-timer .ring-wrap { position:relative; width:150px; height:150px; margin:0 auto 10px; }
+.garden-timer .ring-wrap svg { transform:rotate(-90deg); }
+.garden-timer .ring-bg { fill:none; stroke:rgba(60,140,60,.15); stroke-width:6; }
+.garden-timer .ring-fg { fill:none; stroke:#80c880; stroke-width:6; stroke-linecap:round; }
+.garden-timer .time { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:34px; font-weight:700; color:#a0e0a0; }
+.garden-timer .deco { position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:20px; }
+.garden-timer .task { font-size:13px; color:#90b888; margin-bottom:8px; }
+.garden-timer .bubbles { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+.garden-timer .bub { padding:6px 14px; border-radius:14px; font-size:12px; background:rgba(60,130,60,.25); color:rgba(160,210,140,.8); }
+.garden-timer .bub.done { background:rgba(80,180,80,.3); color:#a0e0a0; }
+.garden-timer .bub.done::after { content:' 🌱'; }
+.garden-timer .btns { display:flex; gap:14px; justify-content:center; }
+.garden-timer .btn-r { width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;background:rgba(80,160,80,.2);color:#90d090; }
+.garden-timer .btn-r.done { background:#5a9a5a; color:#e0ffe0; }
+.garden-timer .btn-label { font-size:9px; color:rgba(140,180,120,.5); margin-top:3px; }
+
+/* ====== B: 木纹复古 ====== */
+.wood {
+  background: linear-gradient(180deg, #3a2a1a 0%, #2e2215 50%, #261c10 100%);
+  background-image: repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,.05) 40px, rgba(0,0,0,.05) 42px);
+  color: #d8c8b0; position:relative;
+}
+.wood::before { content:''; position:absolute; top:0;left:0;right:0;bottom:0; background:radial-gradient(ellipse at 50% 30%, rgba(180,140,100,.06) 0%, transparent 70%); pointer-events:none; }
+.wood .header { text-align:center; margin-bottom:14px; position:relative; z-index:1; }
+.wood .btn-free { background:rgba(180,140,100,.12); border:2px solid rgba(180,140,100,.25); color:#c8a878; border-radius:6px; padding:9px 22px; font-size:13px; cursor:pointer; font-family: Georgia, serif; }
+.wood .smart-badge { color:rgba(200,160,120,.5); }
+.wood .task-item { background:rgba(60,40,20,.4); border:1px solid rgba(100,70,40,.3); border-radius:8px; display:flex; align-items:center; gap:8px; padding:9px 12px; margin-bottom:5px; font-size:13px; position:relative; z-index:1; }
+.wood .task-item .play { width:28px;height:28px;border-radius:4px;background:#6a4a2a;color:#c8a878;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;flex-shrink:0; }
+.wood .task-item .play.done-play { background:#4a6a3a; color:#a0c880; }
+.wood .section-title { font-size:10px; letter-spacing:3px; color:rgba(180,140,100,.5); margin-bottom:6px; font-family:Georgia,serif; position:relative; z-index:1; }
+.wood .stats-tab { padding:4px 12px;border-radius:4px;font-size:11px;color:rgba(180,140,100,.5);border:1px solid rgba(100,70,40,.3);cursor:pointer;display:inline-block;margin-right:4px;font-family:Georgia,serif; }
+.wood .stats-tab.on { background:rgba(140,100,60,.3); color:#d8b888; }
+/* 计时态 */
+.wood-timer { background:linear-gradient(180deg,#3a2a1a,#2e2215); text-align:center; }
+.wood-timer .ring-wrap { position:relative; width:150px; height:150px; margin:0 auto 8px; }
+.wood-timer .ring-wrap svg { transform:rotate(-90deg); }
+.wood-timer .ring-bg { fill:none; stroke:rgba(140,100,60,.15); stroke-width:7; }
+.wood-timer .ring-fg { fill:none; stroke:#c8a878; stroke-width:7; stroke-linecap:butt; }
+.wood-timer .time { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:36px; font-weight:700; color:#d8c0a0; font-family:Georgia,serif; }
+.wood-timer .task { font-size:13px; color:#a09078; margin-bottom:8px; }
+.wood-timer .bubbles { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+.wood-timer .bub { padding:6px 14px; border-radius:4px; font-size:12px; background:rgba(100,70,40,.3); color:rgba(200,170,130,.8); }
+.wood-timer .bub.done { background:rgba(120,160,100,.2); color:#a0c880; text-decoration:line-through; }
+.wood-timer .btns { display:flex; gap:14px; justify-content:center; }
+.wood-timer .btn-r { width:38px;height:38px;border-radius:6px;border:2px solid rgba(180,140,100,.3);background:rgba(100,70,40,.2);color:#c8a878;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
+.wood-timer .btn-r.done { background:#6a4a2a; border-color:#c8a878; color:#d8c0a0; }
+.wood-timer .btn-label { font-size:9px; color:rgba(180,140,100,.4); margin-top:3px; font-family:Georgia,serif; }
+
+/* ====== C: 软糯 Mochi ====== */
+.mochi {
+  background: linear-gradient(180deg, #2a1a2e 0%, #1e1828 50%, #221a30 100%);
+  color: #e0d0f0; position:relative; overflow:hidden;
+}
+.mochi::before { content:'🍡'; position:absolute; top:10px; right:16px; font-size:28px; opacity:.5; animation: floatM 3s ease-in-out infinite; }
+@keyframes floatM { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.mochi .header { text-align:center; margin-bottom:14px; position:relative; z-index:1; }
+.mochi .btn-free { background:rgba(200,160,220,.12); border:2px solid rgba(200,160,220,.2); color:#d8b8f0; border-radius:24px; padding:10px 24px; font-size:13px; cursor:pointer; box-shadow:0 2px 8px rgba(200,160,220,.1); }
+.mochi .smart-badge { color:rgba(220,180,240,.5); }
+.mochi .task-item { background:rgba(80,60,100,.25); border:2px solid rgba(120,100,140,.15); border-radius:16px; display:flex; align-items:center; gap:8px; padding:10px 14px; margin-bottom:5px; font-size:13px; position:relative; z-index:1; }
+.mochi .task-item .play { width:32px;height:32px;border-radius:50%;background:rgba(200,160,220,.2);color:#d8b8f0;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0; box-shadow:0 2px 6px rgba(200,160,220,.15); }
+.mochi .task-item .play.done-play { background:rgba(160,220,180,.25); color:#b8f0d0; }
+.mochi .section-title { font-size:10px; letter-spacing:2px; color:rgba(200,170,220,.45); margin-bottom:6px; position:relative; z-index:1; }
+.mochi .stats-tab { padding:5px 14px;border-radius:16px;font-size:11px;color:rgba(200,170,220,.4);border:1px solid rgba(120,100,140,.2);cursor:pointer;display:inline-block;margin-right:4px; }
+.mochi .stats-tab.on { background:rgba(160,120,200,.25); color:#d8c0f0; border-color:rgba(180,140,210,.35); }
+/* 计时态 */
+.mochi-timer { background:linear-gradient(180deg,#2a1a2e,#1e1828); text-align:center; }
+.mochi-timer .ring-wrap { position:relative; width:160px; height:160px; margin:0 auto 10px; }
+.mochi-timer .ring-wrap svg { transform:rotate(-90deg); }
+.mochi-timer .ring-bg { fill:none; stroke:rgba(160,120,200,.1); stroke-width:8; }
+.mochi-timer .ring-fg { fill:none; stroke:#c8a0e0; stroke-width:8; stroke-linecap:round; filter:drop-shadow(0 0 6px rgba(200,160,220,.3)); }
+.mochi-timer .time { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:36px; font-weight:700; color:#f0d0ff; }
+.mochi-timer .task { font-size:13px; color:#b098c8; margin-bottom:8px; }
+.mochi-timer .bubbles { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
+.mochi-timer .bub { padding:7px 16px; border-radius:20px; font-size:12px; background:rgba(120,80,160,.2); color:rgba(210,180,230,.8); box-shadow:0 2px 4px rgba(0,0,0,.2); }
+.mochi-timer .bub.done { background:rgba(140,200,160,.2); color:#b8f0d0; }
+.mochi-timer .btns { display:flex; gap:14px; justify-content:center; }
+.mochi-timer .btn-r { width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;background:rgba(160,120,200,.2);color:#d0b0e8; box-shadow:0 3px 8px rgba(0,0,0,.3); }
+.mochi-timer .btn-r.done { background:linear-gradient(135deg,#c8a0e0,#b888d0); color:#2a1a2e; box-shadow:0 4px 12px rgba(200,160,220,.25); }
+.mochi-timer .btn-label { font-size:9px; color:rgba(200,170,220,.4); margin-top:4px; }
+</style>
+</head>
+<body>
+
+<h2>🌿 凝神 · 三种风格化设计</h2>
+<div class="wrap">
+
+<div style="position:relative;">
+  <div class="label">A · 庭园生长 🌱</div>
+  <div class="card garden">
+    <div class="header"><span class="btn-free">🧘 Let's 专注</span> <span class="smart-badge">🧠</span></div>
+    <div class="section-title">待凝神</div>
+    <div class="task-item"><span class="play">▶</span><span class="name">写月度报告</span><span class="meta">3子 · 60min</span></div>
+    <div class="task-item"><span class="play">▶</span><span class="name">整理邮件</span><span class="meta">30min</span></div>
+    <div class="task-item"><span class="play done-play">✓</span><span class="name">整理大纲</span><span class="meta">已完成</span></div>
+    <div class="stats">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:12px;opacity:.6;">📊</span><span style="font-size:11px;opacity:.4;">🌱 近7天 4.8h</span></div>
+      <span class="stats-tab on">热力图</span><span class="stats-tab">趋势</span><span class="stats-tab">时段</span>
+    </div>
+  </div>
+</div>
+
+<div style="position:relative;">
+  <div class="label">B · 木纹复古 🪵</div>
+  <div class="card wood">
+    <div class="header"><span class="btn-free">🧘 Let's 专注</span> <span class="smart-badge">🧠</span></div>
+    <div class="section-title">待凝神</div>
+    <div class="task-item"><span class="play">▶</span><span class="name">写月度报告</span><span class="meta">3子 · 60min</span></div>
+    <div class="task-item"><span class="play">▶</span><span class="name">整理邮件</span><span class="meta">30min</span></div>
+    <div class="task-item"><span class="play done-play">✓</span><span class="name">整理大纲</span><span class="meta">已完成</span></div>
+    <div class="stats" style="margin-top:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:12px;opacity:.6;">📊</span><span style="font-size:11px;opacity:.4;">近7天 4.8h</span></div>
+      <span class="stats-tab on">热力图</span><span class="stats-tab">趋势</span><span class="stats-tab">时段</span>
+    </div>
+  </div>
+</div>
+
+<div style="position:relative;">
+  <div class="label">C · 软糯 Mochi 🍡</div>
+  <div class="card mochi">
+    <div class="header"><span class="btn-free">🧘 Let's 专注</span> <span class="smart-badge">🧠</span></div>
+    <div class="section-title">待凝神</div>
+    <div class="task-item"><span class="play">▶</span><span class="name">写月度报告</span><span class="meta">3子 · 60min</span></div>
+    <div class="task-item"><span class="play">▶</span><span class="name">整理邮件</span><span class="meta">30min</span></div>
+    <div class="task-item"><span class="play done-play">✓</span><span class="name">整理大纲</span><span class="meta">已完成</span></div>
+    <div class="stats" style="margin-top:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:12px;opacity:.6;">📊</span><span style="font-size:11px;opacity:.4;">近7天 4.8h</span></div>
+      <span class="stats-tab on">热力图</span><span class="stats-tab">趋势</span><span class="stats-tab">时段</span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<h2>⏱ 计时中</h2>
+<div class="wrap">
+
+<div class="card garden-timer">
+  <div class="ring-wrap">
+    <span class="deco">🌻</span>
+    <svg width="150" height="150" viewBox="0 0 150 150"><circle class="ring-bg" cx="75" cy="75" r="62"/><circle class="ring-fg" cx="75" cy="75" r="62" stroke-dasharray="389" stroke-dashoffset="100"/></svg>
+    <div class="time">18:32</div>
+  </div>
+  <div class="task">写月度报告</div>
+  <div class="bubbles"><span class="bub done">整理大纲</span><span class="bub">填写数据</span><span class="bub">校对</span></div>
+  <div class="btns"><div><button class="btn-r">⏸</button><div class="btn-label">休息</div></div><div><button class="btn-r done">✓</button><div class="btn-label">完成</div></div></div>
+</div>
+
+<div class="card wood-timer">
+  <div class="ring-wrap">
+    <svg width="150" height="150" viewBox="0 0 150 150"><circle class="ring-bg" cx="75" cy="75" r="62"/><circle class="ring-fg" cx="75" cy="75" r="62" stroke-dasharray="389" stroke-dashoffset="100"/></svg>
+    <div class="time">18:32</div>
+  </div>
+  <div class="task">写月度报告</div>
+  <div class="bubbles"><span class="bub done">整理大纲</span><span class="bub">填写数据</span><span class="bub">校对</span></div>
+  <div class="btns"><div><button class="btn-r">⏸</button><div class="btn-label">休憩</div></div><div><button class="btn-r done">✓</button><div class="btn-label">完成</div></div></div>
+</div>
+
+<div class="card mochi-timer">
+  <div class="ring-wrap">
+    <svg width="160" height="160" viewBox="0 0 160 160"><circle class="ring-bg" cx="80" cy="80" r="66"/><circle class="ring-fg" cx="80" cy="80" r="66" stroke-dasharray="414" stroke-dashoffset="100"/></svg>
+    <div class="time">18:32</div>
+  </div>
+  <div class="task">写月度报告</div>
+  <div class="bubbles"><span class="bub done">整理大纲</span><span class="bub">填写数据</span><span class="bub">校对</span></div>
+  <div class="btns"><div><button class="btn-r">⏸</button><div class="btn-label">休息</div></div><div><button class="btn-r done">✓</button><div class="btn-label">完成</div></div></div>
+</div>
+
+</div>
+
+</body>
+</html>

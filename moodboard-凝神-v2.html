@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>凝神 UI · 三款风格</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family: -apple-system, "Segoe UI", sans-serif; background:#0f0f14; padding:20px; }
+h2 { text-align:center; font-size:13px; color:#888; margin-bottom:14px; }
+.wrap { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+.card { width:300px; min-height:380px; border-radius:24px; padding:28px 20px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,.4); }
+.label { position:absolute; top:10px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.6); color:#fff; padding:3px 10px; border-radius:10px; font-size:10px; z-index:5; }
+
+/* ====== ① 深夜玻璃 ====== */
+.glass {
+  background: linear-gradient(160deg, rgba(25,22,40,.9) 0%, rgba(30,26,48,.8) 100%);
+  color: #e0d8f0; position:relative;
+}
+.glass::before { content:''; position:absolute; top:40px; left:50%; transform:translateX(-50%); width:140px; height:140px; border-radius:50%; background:radial-gradient(circle,rgba(130,120,200,.08) 0%,transparent 70%); pointer-events:none; }
+.glass .ring-wrap { position:relative; width:160px; height:160px; margin:0 auto 16px; }
+.glass .ring-wrap svg { transform:rotate(-90deg); }
+.glass .ring-bg { fill:none; stroke:rgba(255,255,255,.06); stroke-width:6; }
+.glass .ring-fg { fill:none; stroke-width:6; stroke-linecap:round; }
+.glass .time { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:38px; font-weight:700; letter-spacing:2px; }
+.glass .task { font-size:13px; color:rgba(200,190,220,.7); margin-bottom:12px; }
+.glass .bubbles { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+.glass .bubble { padding:6px 14px; border-radius:16px; font-size:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:rgba(200,190,220,.6); }
+.glass .bubble.done { background:rgba(100,200,130,.1); border-color:rgba(100,200,130,.2); color:rgba(130,210,160,.8); text-decoration:line-through; }
+.glass .btns { display:flex; gap:16px; justify-content:center; }
+.glass .btn-c { width:40px; height:40px; border-radius:50%; border:none; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.06); color:#c8c0e0; }
+.glass .btn-c.done-btn { background:rgba(100,180,130,.15); color:#90d0a0; }
+.glass .btn-label { font-size:9px; color:rgba(200,190,220,.4); margin-top:3px; }
+
+/* ====== ② 暖系猫=^..^= ====== */
+.catppuccin {
+  background: linear-gradient(160deg, #1e1e2e 0%, #181825 50%, #11111b 100%);
+  color: #cdd6f4; position:relative;
+}
+.catppuccin::before { content:''; position:absolute; top:30px; left:50%; transform:translateX(-50%); width:150px; height:150px; border-radius:50%; background:radial-gradient(circle,rgba(203,166,247,.1) 0%,transparent 70%); pointer-events:none; }
+.catppuccin .ring-wrap { position:relative; width:160px; height:160px; margin:0 auto 14px; }
+.catppuccin .ring-wrap svg { transform:rotate(-90deg); }
+.catppuccin .ring-bg { fill:none; stroke:#313244; stroke-width:8; }
+.catppuccin .ring-fg { fill:none; stroke-width:8; stroke-linecap:round; }
+.catppuccin .time { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:42px; font-weight:700; color:#f5c2e7; }
+.catppuccin .task { font-size:13px; color:#a6adc8; margin-bottom:10px; }
+.catppuccin .bubbles { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+.catppuccin .bubble { padding:6px 14px; border-radius:16px; font-size:12px; background:#313244; color:#bac2de; }
+.catppuccin .bubble.done { background:#a6e3a1; color:#1e1e2e; text-decoration:line-through; }
+.catppuccin .btns { display:flex; gap:16px; justify-content:center; }
+.catppuccin .btn-c { width:44px; height:44px; border-radius:50%; border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
+.catppuccin .btn-c.rest { background:#45475a; color:#cdd6f4; }
+.catppuccin .btn-c.done-btn { background:#a6e3a1; color:#1e1e2e; }
+.catppuccin .btn-label { font-size:9px; color:#585b70; margin-top:3px; }
+
+/* ====== ③ 全屏极简 ====== */
+.zen {
+  background: #000; color: #fff; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:380px;
+}
+.zen .time-zen { font-size:72px; font-weight:200; letter-spacing:4px; margin-bottom:8px; }
+.zen .task { font-size:14px; color:#888; margin-bottom:20px; }
+.zen .btns { display:flex; gap:20px; }
+.zen .btn-z { width:48px; height:48px; border-radius:50%; border:1px solid #333; background:transparent; color:#888; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.zen .btn-z.done-btn { border-color:#fff; color:#fff; }
+</style>
+</head>
+<body>
+
+<h2>🎯 凝神 · 三种风格参考</h2>
+
+<div class="wrap">
+
+<div style="position:relative;">
+  <div class="label">A · 深夜玻璃</div>
+  <div class="card glass">
+    <div class="ring-wrap">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle class="ring-bg" cx="80" cy="80" r="70"/>
+        <circle class="ring-fg" cx="80" cy="80" r="70" stroke="#9880d0" stroke-dasharray="439.8" stroke-dashoffset="120" opacity=".8"/>
+      </svg>
+      <div class="time">18:32</div>
+    </div>
+    <div class="task">写月度报告</div>
+    <div class="bubbles">
+      <span class="bubble done">整理大纲</span><span class="bubble">填写数据</span><span class="bubble">校对</span>
+    </div>
+    <div class="btns">
+      <div><button class="btn-c">⏸</button><div class="btn-label">休息</div></div>
+      <div><button class="btn-c done-btn">✓</button><div class="btn-label">完成</div></div>
+    </div>
+  </div>
+</div>
+
+<div style="position:relative;">
+  <div class="label">B · 暖系猫</div>
+  <div class="card catppuccin">
+    <div class="ring-wrap">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle class="ring-bg" cx="80" cy="80" r="70"/>
+        <circle class="ring-fg" cx="80" cy="80" r="70" stroke="#cba6f7" stroke-dasharray="439.8" stroke-dashoffset="120"/>
+      </svg>
+      <div class="time">18:32</div>
+    </div>
+    <div class="task">写月度报告</div>
+    <div class="bubbles">
+      <span class="bubble done">整理大纲</span><span class="bubble">填写数据</span><span class="bubble">校对</span>
+    </div>
+    <div class="btns">
+      <div><button class="btn-c rest">⏸</button><div class="btn-label">休息</div></div>
+      <div><button class="btn-c done-btn">✓</button><div class="btn-label">完成</div></div>
+    </div>
+  </div>
+</div>
+
+<div style="position:relative;">
+  <div class="label">C · 全屏极简</div>
+  <div class="card zen">
+    <div class="time-zen">18:32</div>
+    <div class="task">写月度报告</div>
+    <div class="btns">
+      <button class="btn-z">⏸</button>
+      <button class="btn-z done-btn">✓</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>
