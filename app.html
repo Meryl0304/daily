@@ -464,9 +464,10 @@ body.night .lang-bubble.fr { background: #222528; color: #a0b0c0; border-color: 
   <div class="card">
     <div class="cal-nav">
       <button onclick="changeCalMonth(-1)">←</button>
-      <span id="calMonthLabel"></span>
+      <span id="calMonthLabel" style="cursor:pointer;" onclick="document.getElementById('calMonthPicker').showPicker()"></span>
+      <input type="month" id="calMonthPicker" style="display:none;" onchange="var v=this.value.split('-');calYear=parseInt(v[0]);calMonth=parseInt(v[1]);renderCalendar()">
       <button onclick="changeCalMonth(1)">→</button>
-      <button class="btn btn-sm" onclick="goCalToday()">今天</button>
+      <button class="btn btn-sm" onclick="goCalToday()" style="font-size:11px;padding:3px 8px;">今天</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
     <div id="calDayBtn" style="text-align:center;margin-top:8px;display:none;">
@@ -482,11 +483,12 @@ body.night .lang-bubble.fr { background: #222528; color: #a0b0c0; border-color: 
 <!-- ====== ② 日详情页 ====== -->
 <div class="page" id="page-day">
   <div class="card" id="dayDetailCard">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <button class="btn btn-sm btn-outline" onclick="switchTab('calendar')">← 日历</button>
-      <button class="btn btn-sm btn-outline" onclick="navDay(-1)">◀</button>
-      <strong id="dayDetailTitle"></strong>
-      <button class="btn btn-sm btn-outline" onclick="navDay(1)">▶</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:4px;">
+      <button class="btn btn-sm btn-outline" onclick="switchTab('calendar')">←</button>
+      <button class="btn btn-sm btn-outline" onclick="navDay(-1)" style="font-size:10px;padding:4px 6px;">◀</button>
+      <strong id="dayDetailTitle" style="cursor:pointer;" onclick="document.getElementById('dayDatePicker').showPicker()"></strong>
+      <input type="date" id="dayDatePicker" style="display:none;" onchange="calSelected=this.value;renderDayDetail();renderCalendar()">
+      <button class="btn btn-sm btn-outline" onclick="navDay(1)" style="font-size:10px;padding:4px 6px;">▶</button>
       <button class="btn btn-sm" id="dayEditToggleBtn" onclick="toggleDayEdit()">✏️</button>
     </div>
     <div class="section-label" style="font-size:16px;font-weight:700;color:var(--accent);">今日事项</div>
