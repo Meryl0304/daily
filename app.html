@@ -194,12 +194,8 @@ body.night .star-box.done { background: rgba(39,174,96,0.12); color: #6aaa7a; }
 .focus-pill.done { background: var(--done); color: #fff; }
 
 /* ====== 过往日期 ====== */
-.day-past-header { background: rgba(40,30,50,.5); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 10px; border: 1px solid rgba(160,120,180,.15); }
-body.night .day-past-header { background: rgba(25,18,32,.6); border-color: rgba(120,80,140,.12); }
 .day-past-header .past-tag { font-size: 11px; color: var(--muted); margin-left: 6px; }
-body.night .day-past-header .past-tag { color: var(--muted); }
-.past-circle { border-color: var(--border) !important; background: transparent !important; color: var(--muted) !important; cursor: default !important; }
-body.night .past-circle { border-color: var(--border) !important; color: var(--muted) !important; }
+.past-circle { cursor: default !important; }
 
 /* ====== 逾期 ====== */
 .overdue-area { margin-bottom: 10px; }
@@ -276,14 +272,16 @@ body.night .focus-ring-fg { stroke:#c8a0e0; filter:drop-shadow(0 0 6px rgba(200,
 .cal-header { font-size: 11px; color: var(--muted); padding: 4px 0; }
 .cal-cell { padding: 5px 1px; border-radius: 8px; cursor: pointer; font-size: 13px; min-height: 32px; position: relative; }
 .cal-cell:hover { background: rgba(160,120,200,.08); }
-.cal-cell.today { background: var(--accent); color: #fff; font-weight: 600; }
-.cal-cell.selected { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cal-cell.today { box-shadow: 0 0 6px 4px rgba(144,128,168,.45); font-weight: 700; }
+.cal-cell.selected { background: var(--accent); color: #fff; font-weight: 600; }
+.cal-cell.today.selected { background: var(--accent); color: #fff; box-shadow: 0 0 10px 6px rgba(144,128,168,.65); }
 .cal-cell .dots { display: flex; justify-content: center; gap: 3px; margin-top: 1px; }
 .cal-cell .dot { width: 4px; height: 4px; border-radius: 50%; }
 .cal-cell .dot.task-done { background: var(--done); }
 .cal-cell .dot.event { background: var(--accent); }
 .cal-cell .dot.overdue-dot { background: var(--warn); }
-.cal-cell.today .dot.task-done, .cal-cell.today .dot.event, .cal-cell.today .dot.overdue-dot { background: #fff; }
+.cal-cell.selected .dot.task-done, .cal-cell.selected .dot.event, .cal-cell.selected .dot.overdue-dot { background: #fff; }
+.cal-cell.today .dot.task-done, .cal-cell.today .dot.event, .cal-cell.today .dot.overdue-dot { background: var(--accent); }
 .cal-cell .task-count { font-size: 10px; color: var(--muted); line-height: 1; }
 
 /* ====== 通知横幅 ====== */
@@ -471,6 +469,9 @@ body.night .lang-bubble.fr { background: #222528; color: #a0b0c0; border-color: 
       <button class="btn btn-sm" onclick="goCalToday()">今天</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
+    <div id="calDayBtn" style="text-align:center;margin-top:8px;display:none;">
+      <button class="btn btn-sm" onclick="switchTab('day')">📋 详情</button>
+    </div>
   </div>
   <div class="card" id="eventsCard">
     <h3 style="margin:0 0 6px 0;">📅 事件</h3>
@@ -586,7 +587,9 @@ body.night .lang-bubble.fr { background: #222528; color: #a0b0c0; border-color: 
       <select id="shopRewardFreqUnit" style="border:1px solid var(--border);border-radius:8px;padding:8px 4px;font-size:12px;background:var(--bg);color:var(--text);">
         <option value="week">次/周</option><option value="month">次/月</option><option value="year">次/年</option>
       </select>
-      <button class="btn" onclick="addShopReward()">+</button>
+    </div>
+    <div style="text-align:center;margin-top:6px;">
+      <button class="btn" onclick="addShopReward()">进货啦</button>
     </div>
   </div>
   <div class="card" id="shopLogCard" style="display:none;">
@@ -1227,6 +1230,8 @@ function renderCalendar() {
     html += '</div>';
   }
   document.getElementById('calGrid').innerHTML = html;
+  var btn = document.getElementById('calDayBtn');
+  if (btn) btn.style.display = calSelected ? '' : 'none';
   renderEvents();
   renderNotifLog();
 }
